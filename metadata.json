@@ -1,0 +1,13 @@
+{
+    "objects": [
+        {
+            "name": "Authentication Service",
+            "category": [
+                "Authentication",
+                "Security"
+            ],
+            "port": 3000,
+            "description": "The authentication service."
+        }
+    ]
+}
