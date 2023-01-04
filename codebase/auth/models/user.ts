@@ -14,6 +14,7 @@ interface IUser {
     password_hash?: string;
     phone_number?: string;
     is_email_confirmed?: boolean;
+    tenant?: string;
 }
 
 interface IUserDocument extends mongoose.Document {
@@ -24,6 +25,7 @@ interface IUserDocument extends mongoose.Document {
     password_hash: string;
     phone_number: string;
     is_email_confirmed: boolean;
+    tenant: string;
 }
 
 interface UserModelInterface extends mongoose.Model<IUserDocument> {
@@ -62,6 +64,21 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,
         unique: false
+    },
+    account_type: {
+        type: String,
+        default: 'single',
+        // 'single' - singular user account not connected to a tenant
+        // 'joined' - a user account joined to a tenant
+        // 'admin' - an admin / tenant admin account
+        unique: false,
+        required: false
+    },
+    tenant: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Tenant',
+        required: false,
+        default: null
     }
 })
 

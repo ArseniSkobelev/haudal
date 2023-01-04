@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const user_1 = require("../models/user");
 const helper_1 = __importDefault(require("../utils/helper"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 class UserController {
     createUser(userData) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -26,7 +27,22 @@ class UserController {
                         yield user.save();
                     }));
                 }
-                return user;
+                if (process.env.SECRET_KEY) {
+                    let SECRET_KEY = process.env.SECRET_KEY;
+                    let token = jsonwebtoken_1.default.sign({ _id: user._id, email: userData.email }, SECRET_KEY, {
+                        expiresIn: '1d'
+                    });
+                    return {
+                        "user": user,
+                        "jwt": {
+                            "token": token
+                        }
+                    };
+                }
+                else {
+                    yield helper.configurationMissing();
+                    return {};
+                }
             }
             catch (err) {
                 console.log(err);

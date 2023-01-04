@@ -1,5 +1,7 @@
 import express, { Request, Response } from "express";
 
+import { verifyToken } from "../middleware/verifyToken";
+
 const router = express.Router();
 
 
@@ -20,7 +22,7 @@ router.get('/api/v1/', async (_req, res) => {
 
 
 //                          test routes
-router.get("/api/v1/ping", async (_req, res) => {
+router.get("/api/v1/ping", verifyToken, async (_req, res) => {
     const controller = new PingController();
     const response = await controller.getMessage();
     return res.send(response);
@@ -34,7 +36,7 @@ router.post('/api/v1/user', async (req: Request, res: Response) => {
     if (response.hasOwnProperty('success')) {
         return res.status(500).json(response);
     } else {
-        return res.status(201).json({ "success": true, "message": "User created successfully", "user": response });
+        return res.status(201).json({ "success": true, "message": "User created successfully", response });
     }
 })
 

@@ -1,5 +1,6 @@
 import { User, IUser } from '../models/user';
 import Helper from '../utils/helper';
+import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
 
 export default class UserController {
     public async createUser(userData: IUser): Promise<object> {
@@ -14,7 +15,23 @@ export default class UserController {
                 })
             }
 
-            return user;
+            if (process.env.SECRET_KEY) {
+                let SECRET_KEY: Secret = process.env.SECRET_KEY;
+
+                let token = jwt.sign({ _id: user._id, email: userData.email }, SECRET_KEY, {
+                    expiresIn: '1d'
+                })
+
+                return {
+                    "user": user,
+                    "jwt": {
+                        "token": token
+                    }
+                };
+            } else {
+                await helper.configurationMissing();
+                return {};
+            }
         } catch (err) {
             console.log(err);
             return { success: false, message: err };
