@@ -15,21 +15,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const user_1 = require("../models/user");
 const helper_1 = __importDefault(require("../utils/helper"));
 class AuthController {
-    login(loginData) {
+    login(loginData, callback) {
         return __awaiter(this, void 0, void 0, function* () {
             const helper = new helper_1.default();
-            user_1.User.findOne({ $or: [{ 'user_name': loginData.user_name }, { 'email': loginData.email }] }, (err, result) => __awaiter(this, void 0, void 0, function* () {
-                if (!err) {
-                    yield helper.isPasswordCorrect(result.password_hash, loginData.plain_password, (result) => __awaiter(this, void 0, void 0, function* () {
-                        if (result) {
-                            // login success
+            user_1.User.findOne({ $or: [{ 'user_name': loginData.user_name }, { 'email': loginData.email }] }, (err, result) => {
+                if (result != null) {
+                    helper.isPasswordCorrect(result.password_hash, loginData.plain_password, (res) => {
+                        if (res) {
+                            helper.createToken(result, (token) => {
+                                return callback({ success: true, data: token });
+                            });
                         }
                         else {
-                            // login failure
+                            return callback({ success: false, data: "ERROR" });
                         }
-                    }));
+                    });
                 }
-            }));
+                else {
+                    return callback({ success: false, data: "ERROR" });
+                }
+            });
         });
     }
 }

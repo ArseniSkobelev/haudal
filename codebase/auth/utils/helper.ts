@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
+import jwt, { Secret } from 'jsonwebtoken';
 
 dotenv.config();
-
 
 export default class Helper {
     public async hashPassword(password: string, callback: any): Promise<any> {
@@ -25,5 +25,15 @@ export default class Helper {
     public async configurationMissing(): Promise<string> {
         console.log("👾 [Haudal | Auth] Some required configuration is missing. Please check the template file for more information.");
         return process.exit(1);
+    }
+
+    public async createToken(data: any, callback: any): Promise<any> {
+        let SECRET_KEY: Secret = process.env.SECRET_KEY!;
+
+        let token = jwt.sign({ _id: data._id, email: data.email }, SECRET_KEY, {
+            expiresIn: '1d'
+        });
+
+        return callback(token);
     }
 }

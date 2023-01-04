@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 dotenv_1.default.config();
 class Helper {
     hashPassword(password, callback) {
@@ -41,6 +42,15 @@ class Helper {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("👾 [Haudal | Auth] Some required configuration is missing. Please check the template file for more information.");
             return process.exit(1);
+        });
+    }
+    createToken(data, callback) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let SECRET_KEY = process.env.SECRET_KEY;
+            let token = jsonwebtoken_1.default.sign({ _id: data._id, email: data.email }, SECRET_KEY, {
+                expiresIn: '1d'
+            });
+            return callback(token);
         });
     }
 }
