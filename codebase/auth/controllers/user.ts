@@ -1,6 +1,6 @@
 import { User, IUser } from '../models/user';
 import Helper from '../utils/helper';
-import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
+import jwt, { Secret } from 'jsonwebtoken';
 import { IUserDocument } from '../models/user'
 
 export interface IUserResponse {

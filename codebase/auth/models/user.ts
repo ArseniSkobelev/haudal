@@ -28,10 +28,6 @@ interface IUserDocument extends mongoose.Document {
     tenant?: string;
 }
 
-interface UserModelInterface extends mongoose.Model<IUserDocument> {
-    build(attr: IUser): IUserDocument;
-}
-
 const userSchema = new Schema({
     user_name: {
         type: String,
@@ -82,10 +78,6 @@ const userSchema = new Schema({
     }
 })
 
-const User = model<any, UserModelInterface>('User', userSchema);
-
-userSchema.statics.build = (user: IUser) => {
-    return new User(user);
-};
+const User = model<any>('User', userSchema);
 
 export { User, IUser, UserLoginData, IUserDocument }
