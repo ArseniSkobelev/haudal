@@ -22,21 +22,25 @@ router.get('/api/v1/', async (_req, res) => {
 
 
 //                          test routes
-router.get("/api/v1/ping", verifyToken, async (_req, res) => {
+router.get("/api/v1/ping", async (_req, res) => {
     const controller = new PingController();
     const response = await controller.getMessage();
-    return res.send(response);
+    return res.status(200).send(response);
 });
 
 
 //                          user routes
 router.post('/api/v1/user', async (req: Request, res: Response) => {
     let controller = new UserController();
-    let response = await controller.createUser(req.body.user);
-    if (response.hasOwnProperty('success')) {
-        return res.status(500).json(response);
+    if (req.body.user != undefined) {
+        let response = await controller.createUser(req.body.user);
+        if (response.hasOwnProperty('success')) {
+            return res.status(500).json(response);
+        } else {
+            return res.status(201).json({ "success": true, "message": "User created successfully", response });
+        }
     } else {
-        return res.status(201).json({ "success": true, "message": "User created successfully", response });
+        return res.status(500);
     }
 })
 

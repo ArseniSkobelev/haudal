@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const verifyToken_1 = require("../middleware/verifyToken");
 const router = express_1.default.Router();
 //                       import API controllers
 const ping_1 = __importDefault(require("../controllers/ping"));
@@ -24,20 +23,25 @@ router.get('/api/v1/', (_req, res) => __awaiter(void 0, void 0, void 0, function
     return res.json({ "success": true, "message": `Haudal Authentication Service v${process.env.VERSION}` });
 }));
 //                          test routes
-router.get("/api/v1/ping", verifyToken_1.verifyToken, (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/api/v1/ping", (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const controller = new ping_1.default();
     const response = yield controller.getMessage();
-    return res.send(response);
+    return res.status(200).send(response);
 }));
 //                          user routes
 router.post('/api/v1/user', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let controller = new user_1.default();
-    let response = yield controller.createUser(req.body.user);
-    if (response.hasOwnProperty('success')) {
-        return res.status(500).json(response);
+    if (req.body.user != undefined) {
+        let response = yield controller.createUser(req.body.user);
+        if (response.hasOwnProperty('success')) {
+            return res.status(500).json(response);
+        }
+        else {
+            return res.status(201).json({ "success": true, "message": "User created successfully", response });
+        }
     }
     else {
-        return res.status(201).json({ "success": true, "message": "User created successfully", response });
+        return res.status(500);
     }
 }));
 //                        session routes

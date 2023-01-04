@@ -28,7 +28,7 @@ const mongoose_1 = __importStar(require("mongoose"));
 const userSchema = new mongoose_1.Schema({
     user_name: {
         type: String,
-        unique: true
+        unique: false
     },
     first_name: {
         type: String,
@@ -51,7 +51,7 @@ const userSchema = new mongoose_1.Schema({
     phone_number: {
         type: Number,
         required: false,
-        unique: true
+        unique: false
     },
     is_email_confirmed: {
         type: Boolean,

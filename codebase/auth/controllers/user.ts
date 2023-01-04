@@ -1,40 +1,64 @@
 import { User, IUser } from '../models/user';
 import Helper from '../utils/helper';
 import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
+import { IUserDocument } from '../models/user'
+
+export interface IUserResponse {
+    user: IUserDocument,
+    jwt: {
+        token: string,
+    }
+}
+
+interface Default {
+    success: boolean,
+    message: string,
+    jwt?: {
+        token?: string
+    }
+}
 
 export default class UserController {
-    public async createUser(userData: IUser): Promise<object> {
-        try {
-            let helper = new Helper();
-            let user = new User(userData);
+    public createUser(userData: IUser): IUserResponse | Default {
+        if (userData) {
+            if (Object.keys(userData).length != 0) {
+                try {
+                    let helper = new Helper();
+                    let user = new User(userData);
 
-            if (userData.password_hash !== undefined) {
-                helper.hashPassword(userData.password_hash, async (hash: any) => {
-                    user.password_hash = hash;
-                    await user.save();
-                })
-            }
-
-            if (process.env.SECRET_KEY) {
-                let SECRET_KEY: Secret = process.env.SECRET_KEY;
-
-                let token = jwt.sign({ _id: user._id, email: userData.email }, SECRET_KEY, {
-                    expiresIn: '1d'
-                })
-
-                return {
-                    "user": user,
-                    "jwt": {
-                        "token": token
+                    if (userData.password_hash !== undefined) {
+                        helper.hashPassword(userData.password_hash, async (hash: any) => {
+                            user.password_hash = hash;
+                            await user.save();
+                        })
                     }
-                };
+
+                    if (process.env.SECRET_KEY) {
+                        let SECRET_KEY: Secret = process.env.SECRET_KEY;
+
+                        let token = jwt.sign({ _id: user._id, email: userData.email }, SECRET_KEY, {
+                            expiresIn: '1d'
+                        })
+
+                        return {
+                            "user": user,
+                            "jwt": {
+                                "token": token
+                            }
+                        };
+                    } else {
+                        helper.configurationMissing();
+                        return { success: false, message: "Configuration missing" };
+                    }
+                } catch (err) {
+                    console.log(err);
+                    return { success: false, message: "Error" };
+                }
             } else {
-                await helper.configurationMissing();
-                return {};
+                return { success: false, message: "Error" };
             }
-        } catch (err) {
-            console.log(err);
-            return { success: false, message: err };
+        } else {
+            return { success: false, message: "Error" };
         }
     }
 }

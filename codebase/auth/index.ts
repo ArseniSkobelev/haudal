@@ -32,3 +32,5 @@ const port = (process.env.PORT != undefined) ? process.env.PORT : 3000;
 app.listen(port, () => {
     console.log(`👾 [Haudal | Auth] Authentication server is running at port ${port}`);
 });
+
+export { app };

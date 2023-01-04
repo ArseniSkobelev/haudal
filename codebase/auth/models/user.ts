@@ -18,14 +18,14 @@ interface IUser {
 }
 
 interface IUserDocument extends mongoose.Document {
-    user_name: string;
-    first_name: string;
-    last_name: string;
-    email: string;
-    password_hash: string;
-    phone_number: string;
-    is_email_confirmed: boolean;
-    tenant: string;
+    user_name?: string;
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    password_hash?: string;
+    phone_number?: string;
+    is_email_confirmed?: boolean;
+    tenant?: string;
 }
 
 interface UserModelInterface extends mongoose.Model<IUserDocument> {
@@ -35,7 +35,7 @@ interface UserModelInterface extends mongoose.Model<IUserDocument> {
 const userSchema = new Schema({
     user_name: {
         type: String,
-        unique: true
+        unique: false
     },
     first_name: {
         type: String,
@@ -58,7 +58,7 @@ const userSchema = new Schema({
     phone_number: {
         type: Number,
         required: false,
-        unique: true
+        unique: false
     },
     is_email_confirmed: {
         type: Boolean,
@@ -88,4 +88,4 @@ userSchema.statics.build = (user: IUser) => {
     return new User(user);
 };
 
-export { User, IUser, UserLoginData }
+export { User, IUser, UserLoginData, IUserDocument }

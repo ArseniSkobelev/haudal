@@ -17,38 +17,46 @@ const helper_1 = __importDefault(require("../utils/helper"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 class UserController {
     createUser(userData) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                let helper = new helper_1.default();
-                let user = new user_1.User(userData);
-                if (userData.password_hash !== undefined) {
-                    helper.hashPassword(userData.password_hash, (hash) => __awaiter(this, void 0, void 0, function* () {
-                        user.password_hash = hash;
-                        yield user.save();
-                    }));
+        if (userData) {
+            if (Object.keys(userData).length != 0) {
+                try {
+                    let helper = new helper_1.default();
+                    let user = new user_1.User(userData);
+                    if (userData.password_hash !== undefined) {
+                        helper.hashPassword(userData.password_hash, (hash) => __awaiter(this, void 0, void 0, function* () {
+                            user.password_hash = hash;
+                            yield user.save();
+                        }));
+                    }
+                    if (process.env.SECRET_KEY) {
+                        let SECRET_KEY = process.env.SECRET_KEY;
+                        let token = jsonwebtoken_1.default.sign({ _id: user._id, email: userData.email }, SECRET_KEY, {
+                            expiresIn: '1d'
+                        });
+                        return {
+                            "user": user,
+                            "jwt": {
+                                "token": token
+                            }
+                        };
+                    }
+                    else {
+                        helper.configurationMissing();
+                        return { success: false, message: "Configuration missing" };
+                    }
                 }
-                if (process.env.SECRET_KEY) {
-                    let SECRET_KEY = process.env.SECRET_KEY;
-                    let token = jsonwebtoken_1.default.sign({ _id: user._id, email: userData.email }, SECRET_KEY, {
-                        expiresIn: '1d'
-                    });
-                    return {
-                        "user": user,
-                        "jwt": {
-                            "token": token
-                        }
-                    };
-                }
-                else {
-                    yield helper.configurationMissing();
-                    return {};
+                catch (err) {
+                    console.log(err);
+                    return { success: false, message: "Error" };
                 }
             }
-            catch (err) {
-                console.log(err);
-                return { success: false, message: err };
+            else {
+                return { success: false, message: "Error" };
             }
-        });
+        }
+        else {
+            return { success: false, message: "Error" };
+        }
     }
 }
 exports.default = UserController;
