@@ -5,12 +5,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const morgan_1 = __importDefault(require("morgan"));
+const routes_1 = __importDefault(require("./routes"));
+const mongoose_1 = __importDefault(require("mongoose"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-const port = (process.env.PORT != undefined) ? process.env.PORT : 3000;
-app.get('/', (req, res) => {
-    res.json({ "success": true, "message": `Haudal Authentication Service v${process.env.VERSION}` });
+app.use((0, morgan_1.default)('tiny'));
+app.use(express_1.default.json());
+app.use(routes_1.default);
+mongoose_1.default.connect(process.env.MONGODB_URI || "localhost", {
+    authSource: "admin",
+    user: process.env.MONGODB_USER,
+    pass: process.env.MONGODB_PASS,
+    connectTimeoutMS: 150000,
+    socketTimeoutMS: 90000,
+    maxIdleTimeMS: 60000
+}, (err) => {
+    if (err)
+        return console.error(err);
+    else {
+        console.log("👾 [Haudal | Auth] Connection to MongoDB established successfully");
+    }
 });
+const port = (process.env.PORT != undefined) ? process.env.PORT : 3000;
 app.listen(port, () => {
     console.log(`👾 [Haudal | Auth] Authentication server is running at port ${port}`);
 });
