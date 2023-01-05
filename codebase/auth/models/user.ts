@@ -31,7 +31,8 @@ interface IUserDocument extends mongoose.Document {
 const userSchema = new Schema({
     user_name: {
         type: String,
-        unique: false
+        unique: true,
+        sparse: true
     },
     first_name: {
         type: String,
@@ -54,7 +55,8 @@ const userSchema = new Schema({
     phone_number: {
         type: Number,
         required: false,
-        unique: false
+        unique: true,
+        sparse: true
     },
     is_email_confirmed: {
         type: Boolean,

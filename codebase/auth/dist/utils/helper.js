@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const user_1 = require("../models/user");
 dotenv_1.default.config();
 class Helper {
     hashPassword(password, callback) {
@@ -51,6 +52,14 @@ class Helper {
                 expiresIn: '1d'
             });
             return callback(token);
+        });
+    }
+    // TODO REMOVE THIS BEFORE ANY PRODUCTION. TEST FUNCTIONALITY ONLY.
+    clearCollections(callback) {
+        return __awaiter(this, void 0, void 0, function* () {
+            user_1.User.deleteMany({}, (err, res) => {
+                callback(err, res);
+            });
         });
     }
 }

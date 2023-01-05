@@ -1,25 +1,9 @@
 import { User, IUser } from '../models/user';
-import Helper from '../utils/helper';
+import Helper, { IResponse } from '../utils/helper';
 import jwt, { Secret } from 'jsonwebtoken';
-import { IUserDocument } from '../models/user'
-
-export interface IUserResponse {
-    user: IUserDocument,
-    jwt: {
-        token: string,
-    }
-}
-
-interface Default {
-    success: boolean,
-    message: string,
-    jwt?: {
-        token?: string
-    }
-}
 
 export default class UserController {
-    public createUser(userData: IUser): IUserResponse | Default {
+    public createUser(userData: IUser, callback: any): any {
         if (userData) {
             if (Object.keys(userData).length != 0) {
                 try {
@@ -40,25 +24,52 @@ export default class UserController {
                             expiresIn: '1d'
                         })
 
-                        return {
-                            "user": user,
-                            "jwt": {
-                                "token": token
+                        return callback({
+                            success: true,
+                            data: {
+                                token: token
                             }
-                        };
+                        })
                     } else {
                         helper.configurationMissing();
-                        return { success: false, message: "Configuration missing" };
+                        return callback({
+                            success: false, data: {
+                                message: "Configuration missing"
+                            }
+                        });
                     }
                 } catch (err) {
                     console.log(err);
-                    return { success: false, message: "Error" };
+                    return callback({ success: false, data: { message: "Error" } });
                 }
-            } else {
-                return { success: false, message: "Error" };
             }
+        }
+    }
+
+    public getUserById(userId: string, callback: any): (IResponse) {
+        if (userId) {
+            const foundUser = User.findById(userId).exec((err: any, doc: any) => {
+                if (err) throw err;
+                let user = doc.toJSON();
+
+                if (user) {
+                    return callback({ success: true, data: { user: user } })
+                } else {
+                    return callback({
+                        success: false, data: {
+                            message: "No user has been found with the provided id"
+                        }
+                    });
+                }
+            });
+
+            return callback({ success: false, data: { message: "Internal Server Error" } })
         } else {
-            return { success: false, message: "Error" };
+            return callback({
+                success: false, data: {
+                    message: "No user id has been provided"
+                }
+            })
         }
     }
 }

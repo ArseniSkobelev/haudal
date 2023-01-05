@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import jwt, { Secret } from 'jsonwebtoken';
+import { User } from '../models/user';
 
 dotenv.config();
 
@@ -36,4 +37,16 @@ export default class Helper {
 
         return callback(token);
     }
+
+    // TODO REMOVE THIS BEFORE ANY PRODUCTION. TEST FUNCTIONALITY ONLY.
+    public async clearCollections(callback: any): Promise<any> {
+        User.deleteMany({}, (err: any, res: any) => {
+            callback(err, res);
+        })
+    }
+}
+
+export interface IResponse {
+    success: boolean;
+    data: any;
 }

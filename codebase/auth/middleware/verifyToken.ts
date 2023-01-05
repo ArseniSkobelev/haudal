@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const SECRET_KEY: Secret = process.env.SECRET_KEY!;
+const SECRET_KEY: Secret = process.env.SECRET_KEY!;
 
 export interface CustomRequest extends Request {
     token: string | JwtPayload;

@@ -12,30 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const user_1 = require("../models/user");
 const helper_1 = __importDefault(require("../utils/helper"));
-class AuthController {
-    login(loginData, callback) {
+class ServiceController {
+    clearCollections(callback) {
         return __awaiter(this, void 0, void 0, function* () {
             const helper = new helper_1.default();
-            user_1.User.findOne({ 'email': loginData.email }, (err, result) => {
-                if (result != null) {
-                    helper.isPasswordCorrect(result.password_hash, loginData.plain_password, (res) => {
-                        if (res) {
-                            helper.createToken(result, (token) => {
-                                return callback({ success: true, data: token });
-                            });
-                        }
-                        else {
-                            return callback({ success: false, data: "ERROR" });
-                        }
-                    });
-                }
-                else {
-                    return callback({ success: false, data: "ERROR" });
-                }
+            helper.clearCollections((err, res) => {
+                return callback(err, res);
             });
         });
     }
 }
-exports.default = AuthController;
+exports.default = ServiceController;

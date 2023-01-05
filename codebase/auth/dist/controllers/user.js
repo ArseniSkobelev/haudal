@@ -16,7 +16,7 @@ const user_1 = require("../models/user");
 const helper_1 = __importDefault(require("../utils/helper"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 class UserController {
-    createUser(userData) {
+    createUser(userData, callback) {
         if (userData) {
             if (Object.keys(userData).length != 0) {
                 try {
@@ -33,29 +33,54 @@ class UserController {
                         let token = jsonwebtoken_1.default.sign({ _id: user._id, email: userData.email }, SECRET_KEY, {
                             expiresIn: '1d'
                         });
-                        return {
-                            "user": user,
-                            "jwt": {
-                                "token": token
+                        return callback({
+                            success: true,
+                            data: {
+                                token: token
                             }
-                        };
+                        });
                     }
                     else {
                         helper.configurationMissing();
-                        return { success: false, message: "Configuration missing" };
+                        return callback({
+                            success: false, data: {
+                                message: "Configuration missing"
+                            }
+                        });
                     }
                 }
                 catch (err) {
                     console.log(err);
-                    return { success: false, message: "Error" };
+                    return callback({ success: false, data: { message: "Error" } });
                 }
             }
-            else {
-                return { success: false, message: "Error" };
-            }
+        }
+    }
+    getUserById(userId, callback) {
+        if (userId) {
+            const foundUser = user_1.User.findById(userId).exec((err, doc) => {
+                if (err)
+                    throw err;
+                let user = doc.toJSON();
+                if (user) {
+                    return callback({ success: true, data: { user: user } });
+                }
+                else {
+                    return callback({
+                        success: false, data: {
+                            message: "No user has been found with the provided id"
+                        }
+                    });
+                }
+            });
+            return callback({ success: false, data: { message: "Internal Server Error" } });
         }
         else {
-            return { success: false, message: "Error" };
+            return callback({
+                success: false, data: {
+                    message: "No user id has been provided"
+                }
+            });
         }
     }
 }

@@ -19,6 +19,8 @@ const router = express_1.default.Router();
 const ping_1 = __importDefault(require("../controllers/ping"));
 const user_1 = __importDefault(require("../controllers/user"));
 const auth_1 = __importDefault(require("../controllers/auth"));
+const service_1 = __importDefault(require("../controllers/service"));
+const verifyUser_1 = require("../middleware/verifyUser");
 //                          index route
 router.get('/api/v1/', (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     return res.json({ "success": true, "message": `Haudal Authentication Service v${process.env.VERSION}` });
@@ -33,16 +35,23 @@ router.get("/api/v1/ping", verifyToken_1.verifyToken, (_req, res) => __awaiter(v
 router.post('/api/v1/user', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let controller = new user_1.default();
     if (req.body.user != undefined) {
-        let response = yield controller.createUser(req.body.user);
-        if (response.hasOwnProperty('success')) {
-            return res.status(500).json(response);
-        }
-        else {
-            return res.status(201).json({ "success": true, "message": "User created successfully", response });
-        }
+        let response = yield controller.createUser(req.body.user, (data) => {
+            if (data.success)
+                return res.status(201).json(data);
+            return res.status(500).json(data);
+        });
     }
     else {
         return res.status(500);
+    }
+}));
+router.get('/api/v1/user/:userId', verifyUser_1.verifyUser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let controller = new user_1.default();
+    if (req.params.userId != undefined) {
+        let response = yield controller.getUserById(req.params.userId, (data) => {
+            if (data.success)
+                return res.status(200).json(data);
+        });
     }
 }));
 //                        session routes
@@ -50,6 +59,16 @@ router.post('/api/v1/session', (req, res) => __awaiter(void 0, void 0, void 0, f
     const controller = new auth_1.default();
     let response = yield controller.login(req.body.login_data, (result) => {
         return res.json(result);
+    });
+}));
+//                        service routes
+router.get("/api/v1/service/clear", (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const controller = new service_1.default();
+    const response = yield controller.clearCollections((err, resp) => {
+        if (!err)
+            return res.status(200).json({ success: true, data: resp });
+        else
+            return res.status(500).json(err);
     });
 }));
 exports.default = router;
