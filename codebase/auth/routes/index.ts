@@ -89,6 +89,17 @@ router.delete('/api/v1/user/:userId', verifyUser, async (req: Request, res: Resp
     }
 });
 
+router.put('/api/v1/user/:userId', verifyUser, async (req: Request, res: Response) => {
+    let controller = new UserController();
+    if (req.params.userId != undefined) {
+        let response = await controller.updateUser(req.params.userId, req.body.user, (data: any) => {
+            if (data.success) return res.status(200).json(data);
+        });
+    } else {
+        return res.status(500).json({ success: false, data: { message: "Internal Server Error" } });
+    }
+});
+
 
 //
 // -------------------------------- Session routes -------------------------------   

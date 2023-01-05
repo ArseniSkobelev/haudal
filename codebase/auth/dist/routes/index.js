@@ -94,6 +94,18 @@ router.delete('/api/v1/user/:userId', verifyUser_1.verifyUser, (req, res) => __a
         return res.status(500).json({ success: false, data: { message: "Internal Server Error" } });
     }
 }));
+router.put('/api/v1/user/:userId', verifyUser_1.verifyUser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let controller = new user_1.default();
+    if (req.params.userId != undefined) {
+        let response = yield controller.updateUser(req.params.userId, req.body.user, (data) => {
+            if (data.success)
+                return res.status(200).json(data);
+        });
+    }
+    else {
+        return res.status(500).json({ success: false, data: { message: "Internal Server Error" } });
+    }
+}));
 //
 // -------------------------------- Session routes -------------------------------   
 //

@@ -114,5 +114,23 @@ class UserController {
         }
         return callback({ success: false, data: { message: "Internal Server Error" } });
     }
+    updateUser(userId, newUser, callback) {
+        user_1.User.updateOne({ _id: userId }, newUser, (err, doc) => {
+            if (err)
+                throw err;
+            if (doc) {
+                return callback({
+                    success: true, data: {
+                        doc
+                    }
+                });
+            }
+        });
+        return callback({
+            success: false, data: {
+                message: "Internal Server Error"
+            }
+        });
+    }
 }
 exports.default = UserController;

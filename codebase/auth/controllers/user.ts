@@ -92,4 +92,22 @@ export default class UserController {
         }
         return callback({ success: false, data: { message: "Internal Server Error" } });
     }
+
+    public updateUser(userId: string, newUser: IUser, callback: any): (IResponse) {
+        User.updateOne({ _id: userId }, newUser, (err: any, doc: any) => {
+            if (err) throw err;
+            if (doc) {
+                return callback({
+                    success: true, data: {
+                        doc
+                    }
+                })
+            }
+        });
+        return callback({
+            success: false, data: {
+                message: "Internal Server Error"
+            }
+        })
+    }
 }
