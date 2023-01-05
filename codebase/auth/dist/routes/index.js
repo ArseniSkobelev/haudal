@@ -60,7 +60,7 @@ router.get("/api/v1/ping", verifyToken_1.verifyToken, (_req, res) => __awaiter(v
 router.post('/api/v1/user', (req, res) => {
     const controller = new user_1.default();
     if (req.body.user != undefined) {
-        controller.createUserFromData(req.body.user, (resp) => {
+        controller.createUser(req.body.user, (resp) => {
             return res.status(resp.status).json({ data: resp.data });
         });
     }

@@ -3,53 +3,7 @@ import Helper, { IResponse } from '../utils/helper';
 import jwt, { Secret } from 'jsonwebtoken';
 
 export default class UserController {
-    public async createUser(userData: IUser, callback: any): Promise<any> {
-        if (userData) {
-            if (Object.keys(userData).length != 0) {
-                try {
-                    let helper = new Helper();
-                    let user = new User(userData);
-
-                    if (userData.password_hash !== undefined) {
-                        helper.hashPassword(userData.password_hash, async (hash: any) => {
-                            user.password_hash = hash;
-                            user.save();
-                        })
-                    }
-
-                    if (process.env.SECRET_KEY) {
-                        let SECRET_KEY: Secret = process.env.SECRET_KEY;
-
-                        let token = jwt.sign({ _id: user._id, email: userData.email }, SECRET_KEY, {
-                            expiresIn: '1d'
-                        });
-
-                        let tempNewUser = JSON.parse(JSON.stringify(user));
-                        let { password_hash, ...newUser } = tempNewUser;
-
-                        return callback({
-                            success: true,
-                            data: {
-                                token: token,
-                                user: newUser,
-                            }
-                        })
-                    } else {
-                        return callback({
-                            success: false, data: {
-                                message: "Configuration missing"
-                            }
-                        });
-                    }
-                } catch (err) {
-                    console.log(err);
-                    return callback({ success: false, data: { message: "Error" } });
-                }
-            }
-        }
-    }
-
-    public createUserFromData(userData: object, callback: any): any {
+    public createUser(userData: object, callback: any): any {
         let user = new User(userData);
         // console.log(user);
 

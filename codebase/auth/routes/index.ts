@@ -58,7 +58,7 @@ router.get("/api/v1/ping", verifyToken, async (_req, res) => {
 router.post('/api/v1/user', (req: Request, res: Response) => {
     const controller = new UserController();
     if (req.body.user != undefined) {
-        controller.createUserFromData(req.body.user, (resp: any) => {
+        controller.createUser(req.body.user, (resp: any) => {
             return res.status(resp.status).json({ data: resp.data });
         });
     } else {
