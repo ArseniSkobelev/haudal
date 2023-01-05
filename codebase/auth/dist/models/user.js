@@ -62,6 +62,7 @@ const userSchema = new mongoose_1.Schema({
     },
     account_type: {
         type: String,
+        enum: ['single', 'joined', 'admin'],
         default: 'single',
         // 'single' - singular user account not connected to a tenant
         // 'joined' - a user account joined to a tenant

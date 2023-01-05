@@ -16,9 +16,9 @@ exports.verifyUser = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const SECRET_KEY = process.env.SECRET_KEY;
 const verifyUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
+    const SECRET_KEY = process.env.SECRET_KEY;
     const token = (_a = req.header('Authorization')) === null || _a === void 0 ? void 0 : _a.replace('Bearer ', '');
     const userId = req.params.userId;
     const decoded = jsonwebtoken_1.default.verify(token, SECRET_KEY, (err, decodedData) => {

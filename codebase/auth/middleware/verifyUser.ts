@@ -4,11 +4,9 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const SECRET_KEY: Secret = process.env.SECRET_KEY!;
-
-
 
 export const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
+    const SECRET_KEY: Secret = process.env.SECRET_KEY!;
     const token = req.header('Authorization')?.replace('Bearer ', '');
     const userId = req.params.userId;
 

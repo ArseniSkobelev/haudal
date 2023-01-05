@@ -22,12 +22,16 @@ export default class UserController {
 
                         let token = jwt.sign({ _id: user._id, email: userData.email }, SECRET_KEY, {
                             expiresIn: '1d'
-                        })
+                        });
+
+                        let tempNewUser = JSON.parse(JSON.stringify(user));
+                        let { password_hash, ...newUser } = tempNewUser;
 
                         return callback({
                             success: true,
                             data: {
-                                token: token
+                                token: token,
+                                user: newUser,
                             }
                         })
                     } else {
@@ -71,5 +75,21 @@ export default class UserController {
                 }
             })
         }
+    }
+
+    public deleteUser(userId: string, callback: any): (IResponse) {
+        if (userId) {
+            User.deleteOne({ _id: userId }).exec((err: any, res: any) => {
+                if (err) throw err;
+                return callback({ success: true, data: { res } });
+            })
+        } else {
+            return callback({
+                success: false, data: {
+                    message: "No user id has been provided"
+                }
+            })
+        }
+        return callback({ success: false, data: { message: "Internal Server Error" } });
     }
 }
