@@ -22,11 +22,8 @@ class Helper {
         return __awaiter(this, void 0, void 0, function* () {
             if (process.env.SALT_ROUNDS != undefined) {
                 bcrypt_1.default.hash(password, parseInt(process.env.SALT_ROUNDS), (err, hash) => {
-                    return callback(hash);
+                    return callback({ success: true, data: { hash } });
                 });
-            }
-            else {
-                return this.configurationMissing();
             }
         });
     }
@@ -37,12 +34,6 @@ class Helper {
                     return callback(err);
                 return callback(result);
             }));
-        });
-    }
-    configurationMissing() {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log("👾 [Haudal | Auth] Some required configuration is missing. Please check the template file for more information.");
-            return process.exit(1);
         });
     }
     createToken(data, callback) {

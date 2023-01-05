@@ -3,7 +3,7 @@ import Helper, { IResponse } from '../utils/helper';
 import jwt, { Secret } from 'jsonwebtoken';
 
 export default class UserController {
-    public createUser(userData: IUser, callback: any): any {
+    public async createUser(userData: IUser, callback: any): Promise<any> {
         if (userData) {
             if (Object.keys(userData).length != 0) {
                 try {
@@ -13,7 +13,7 @@ export default class UserController {
                     if (userData.password_hash !== undefined) {
                         helper.hashPassword(userData.password_hash, async (hash: any) => {
                             user.password_hash = hash;
-                            await user.save();
+                            user.save();
                         })
                     }
 
@@ -35,7 +35,6 @@ export default class UserController {
                             }
                         })
                     } else {
-                        helper.configurationMissing();
                         return callback({
                             success: false, data: {
                                 message: "Configuration missing"
@@ -48,6 +47,38 @@ export default class UserController {
                 }
             }
         }
+    }
+
+    public createUserFromData(userData: object, callback: any): any {
+        let user = new User(userData);
+        // console.log(user);
+
+        const helper = new Helper();
+
+        helper.hashPassword(user.password_hash, (hash: any) => {
+            user.password_hash = hash.data.hash;
+
+            let SECRET_KEY: Secret = process.env.SECRET_KEY!;
+
+            let token = jwt.sign({ _id: user._id, email: user.email }, SECRET_KEY, {
+                expiresIn: '1d'
+            });
+
+            let tempNewUser = JSON.parse(JSON.stringify(user));
+            let { password_hash, ...newUser } = tempNewUser;
+
+            user.save(async (err: any) => {
+                if (err && err.code !== 11000) {
+                    return callback({ status: 500, data: { message: "Internal Server Error" } })
+                }
+
+                if (err && err.code === 11000) {
+                    return callback({ status: 500, data: { message: "Internal Server Error" } })
+                }
+
+                return callback({ status: 201, data: { newUser, token: token } })
+            });
+        })
     }
 
     public getUserById(userId: string, callback: any): (IResponse) {

@@ -57,19 +57,17 @@ router.get("/api/v1/ping", verifyToken_1.verifyToken, (_req, res) => __awaiter(v
 //
 // --------------------------------- User routes ---------------------------------   
 //
-router.post('/api/v1/user', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let controller = new user_1.default();
+router.post('/api/v1/user', (req, res) => {
+    const controller = new user_1.default();
     if (req.body.user != undefined) {
-        let response = yield controller.createUser(req.body.user, (data) => {
-            if (data.success)
-                return res.status(201).json(data);
-            return res.status(500).json(data);
+        controller.createUserFromData(req.body.user, (resp) => {
+            return res.status(resp.status).json({ data: resp.data });
         });
     }
     else {
-        return res.status(500).json({ success: false, data: { message: "Internal Server Error" } });
+        return res.status(500).json({ data: { message: "Internal Server Error" } });
     }
-}));
+});
 router.get('/api/v1/user/:userId', verifyUser_1.verifyUser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let controller = new user_1.default();
     if (req.params.userId != undefined) {

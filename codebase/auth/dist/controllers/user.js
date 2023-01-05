@@ -28,47 +28,71 @@ const helper_1 = __importDefault(require("../utils/helper"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 class UserController {
     createUser(userData, callback) {
-        if (userData) {
-            if (Object.keys(userData).length != 0) {
-                try {
-                    let helper = new helper_1.default();
-                    let user = new user_1.User(userData);
-                    if (userData.password_hash !== undefined) {
-                        helper.hashPassword(userData.password_hash, (hash) => __awaiter(this, void 0, void 0, function* () {
-                            user.password_hash = hash;
-                            yield user.save();
-                        }));
+        return __awaiter(this, void 0, void 0, function* () {
+            if (userData) {
+                if (Object.keys(userData).length != 0) {
+                    try {
+                        let helper = new helper_1.default();
+                        let user = new user_1.User(userData);
+                        if (userData.password_hash !== undefined) {
+                            helper.hashPassword(userData.password_hash, (hash) => __awaiter(this, void 0, void 0, function* () {
+                                user.password_hash = hash;
+                                user.save();
+                            }));
+                        }
+                        if (process.env.SECRET_KEY) {
+                            let SECRET_KEY = process.env.SECRET_KEY;
+                            let token = jsonwebtoken_1.default.sign({ _id: user._id, email: userData.email }, SECRET_KEY, {
+                                expiresIn: '1d'
+                            });
+                            let tempNewUser = JSON.parse(JSON.stringify(user));
+                            let { password_hash } = tempNewUser, newUser = __rest(tempNewUser, ["password_hash"]);
+                            return callback({
+                                success: true,
+                                data: {
+                                    token: token,
+                                    user: newUser,
+                                }
+                            });
+                        }
+                        else {
+                            return callback({
+                                success: false, data: {
+                                    message: "Configuration missing"
+                                }
+                            });
+                        }
                     }
-                    if (process.env.SECRET_KEY) {
-                        let SECRET_KEY = process.env.SECRET_KEY;
-                        let token = jsonwebtoken_1.default.sign({ _id: user._id, email: userData.email }, SECRET_KEY, {
-                            expiresIn: '1d'
-                        });
-                        let tempNewUser = JSON.parse(JSON.stringify(user));
-                        let { password_hash } = tempNewUser, newUser = __rest(tempNewUser, ["password_hash"]);
-                        return callback({
-                            success: true,
-                            data: {
-                                token: token,
-                                user: newUser,
-                            }
-                        });
+                    catch (err) {
+                        console.log(err);
+                        return callback({ success: false, data: { message: "Error" } });
                     }
-                    else {
-                        helper.configurationMissing();
-                        return callback({
-                            success: false, data: {
-                                message: "Configuration missing"
-                            }
-                        });
-                    }
-                }
-                catch (err) {
-                    console.log(err);
-                    return callback({ success: false, data: { message: "Error" } });
                 }
             }
-        }
+        });
+    }
+    createUserFromData(userData, callback) {
+        let user = new user_1.User(userData);
+        // console.log(user);
+        const helper = new helper_1.default();
+        helper.hashPassword(user.password_hash, (hash) => {
+            user.password_hash = hash.data.hash;
+            let SECRET_KEY = process.env.SECRET_KEY;
+            let token = jsonwebtoken_1.default.sign({ _id: user._id, email: user.email }, SECRET_KEY, {
+                expiresIn: '1d'
+            });
+            let tempNewUser = JSON.parse(JSON.stringify(user));
+            let { password_hash } = tempNewUser, newUser = __rest(tempNewUser, ["password_hash"]);
+            user.save((err) => __awaiter(this, void 0, void 0, function* () {
+                if (err && err.code !== 11000) {
+                    return callback({ status: 500, data: { message: "Internal Server Error" } });
+                }
+                if (err && err.code === 11000) {
+                    return callback({ status: 500, data: { message: "Internal Server Error" } });
+                }
+                return callback({ status: 201, data: { newUser, token: token } });
+            }));
+        });
     }
     getUserById(userId, callback) {
         if (userId) {

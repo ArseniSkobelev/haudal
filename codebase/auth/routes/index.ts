@@ -55,15 +55,14 @@ router.get("/api/v1/ping", verifyToken, async (_req, res) => {
 //
 // --------------------------------- User routes ---------------------------------   
 //
-router.post('/api/v1/user', async (req: Request, res: Response) => {
-    let controller = new UserController();
+router.post('/api/v1/user', (req: Request, res: Response) => {
+    const controller = new UserController();
     if (req.body.user != undefined) {
-        let response = await controller.createUser(req.body.user, (data: any) => {
-            if (data.success) return res.status(201).json(data);
-            return res.status(500).json(data);
+        controller.createUserFromData(req.body.user, (resp: any) => {
+            return res.status(resp.status).json({ data: resp.data });
         });
     } else {
-        return res.status(500).json({ success: false, data: { message: "Internal Server Error" } });
+        return res.status(500).json({ data: { message: "Internal Server Error" } });
     }
 })
 
