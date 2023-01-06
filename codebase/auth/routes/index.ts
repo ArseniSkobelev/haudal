@@ -112,6 +112,7 @@ router.post('/api/v1/session', async (req: Request, res: Response) => {
     });
 })
 
+
 //
 // -------------------------------- Service routes -------------------------------
 // FIXME: Service routes are not supposed to ever be accessible in a production environment.
