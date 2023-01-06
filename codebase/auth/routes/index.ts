@@ -117,7 +117,6 @@ router.post('/api/v1/session', async (req: Request, res: Response) => {
 // -------------------------------- Service routes -------------------------------
 // FIXME: Service routes are not supposed to ever be accessible in a production environment.
 //
-
 if (process.env.NODE_ENV === 'development') {
     // This route clears all of the collections defined in the helper class.
     router.get("/api/v1/service/clear", async (_req, res) => {
