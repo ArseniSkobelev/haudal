@@ -1,4 +1,4 @@
-// --------------------- Haudal Authentication Microservice --------------------- 
+// --------------------- Haudal Authentication Microservice ---------------------
 //
 //     Developed by:         Arseni Skobelev
 //     Development started:  02.01.2023
@@ -11,21 +11,21 @@
 
 
 //
-// --------------------- Default configuration and imports ----------------------   
+// --------------------- Default configuration and imports ----------------------
 //
 import express, { Request, Response } from "express";
 const router = express.Router();
 
 
 //
-// ----------------------------- Middleware imports -----------------------------   
+// ----------------------------- Middleware imports -----------------------------
 //
 import { verifyToken } from "../middleware/verifyToken";
 import { verifyUser } from "../middleware/verifyUser";
 
 
 //
-// --------------------------- API Controller imports ---------------------------   
+// --------------------------- API Controller imports ---------------------------
 //
 import PingController from "../controllers/ping";
 import UserController from "../controllers/user";
@@ -34,26 +34,28 @@ import ServiceController from "../controllers/service";
 
 
 //
-// -------------------------------- Index routes --------------------------------   
+// -------------------------------- Index routes --------------------------------
 //
 router.get('/api/v1/', async (_req, res) => {
-    return res.json({ "success": true, "message": `Haudal Authentication Service v${process.env.VERSION}` });
+    return res.json({ "success": true, "message": `Haudal Authentication Service v${process.env.VERSION}. The application is currently in ${process.env.NODE_ENV}` });
 });
 
 
 //
-// --------------------------------- Test routes ---------------------------------   
+// --------------------------------- Test routes ---------------------------------
 // FIXME: Test routes are not supposed to ever be accessible in a production environment.
 //
-router.get("/api/v1/ping", verifyToken, async (_req, res) => {
-    const controller = new PingController();
-    const response = await controller.getMessage();
-    return res.status(200).send(response);
-});
+if (process.env.NODE_ENV === 'development') {
+    router.get("/api/v1/ping", async (_req, res) => {
+        const controller = new PingController();
+        const response = await controller.getMessage();
+        return res.status(200).send(response);
+    });
+}
 
 
 //
-// --------------------------------- User routes ---------------------------------   
+// --------------------------------- User routes ---------------------------------
 //
 router.post('/api/v1/user', (req: Request, res: Response) => {
     const controller = new UserController();
@@ -101,7 +103,7 @@ router.put('/api/v1/user/:userId', verifyUser, async (req: Request, res: Respons
 
 
 //
-// -------------------------------- Session routes -------------------------------   
+// -------------------------------- Session routes -------------------------------
 //
 router.post('/api/v1/session', async (req: Request, res: Response) => {
     const controller = new AuthController();
@@ -111,18 +113,21 @@ router.post('/api/v1/session', async (req: Request, res: Response) => {
 })
 
 //
-// -------------------------------- Service routes -------------------------------   
+// -------------------------------- Service routes -------------------------------
 // FIXME: Service routes are not supposed to ever be accessible in a production environment.
 //
 
-// This route clears all of the collections defined in the helper class.
-router.get("/api/v1/service/clear", async (_req, res) => {
-    const controller = new ServiceController();
-    const response = await controller.clearCollections((err: any, resp: any) => {
-        if (!err) return res.status(200).json({ success: true, data: resp });
-        else return res.status(500).json(err);
+if (process.env.NODE_ENV === 'development') {
+    // This route clears all of the collections defined in the helper class.
+    router.get("/api/v1/service/clear", async (_req, res) => {
+        const controller = new ServiceController();
+        const response = await controller.clearCollections((err: any, resp: any) => {
+            if (!err) return res.status(200).json({ success: true, data: resp });
+            else return res.status(500).json(err);
+        });
     });
-});
+}
 
 
+// Default export for the router
 export default router;

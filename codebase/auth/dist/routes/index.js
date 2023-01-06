@@ -1,5 +1,5 @@
 "use strict";
-// --------------------- Haudal Authentication Microservice --------------------- 
+// --------------------- Haudal Authentication Microservice ---------------------
 //
 //     Developed by:         Arseni Skobelev
 //     Development started:  02.01.2023
@@ -23,39 +23,37 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 //
-// --------------------- Default configuration and imports ----------------------   
+// --------------------- Default configuration and imports ----------------------
 //
 const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
-//
-// ----------------------------- Middleware imports -----------------------------   
-//
-const verifyToken_1 = require("../middleware/verifyToken");
 const verifyUser_1 = require("../middleware/verifyUser");
 //
-// --------------------------- API Controller imports ---------------------------   
+// --------------------------- API Controller imports ---------------------------
 //
 const ping_1 = __importDefault(require("../controllers/ping"));
 const user_1 = __importDefault(require("../controllers/user"));
 const auth_1 = __importDefault(require("../controllers/auth"));
 const service_1 = __importDefault(require("../controllers/service"));
 //
-// -------------------------------- Index routes --------------------------------   
+// -------------------------------- Index routes --------------------------------
 //
 router.get('/api/v1/', (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    return res.json({ "success": true, "message": `Haudal Authentication Service v${process.env.VERSION}` });
+    return res.json({ "success": true, "message": `Haudal Authentication Service v${process.env.VERSION}. The application is currently in ${process.env.NODE_ENV}` });
 }));
 //
-// --------------------------------- Test routes ---------------------------------   
+// --------------------------------- Test routes ---------------------------------
 // FIXME: Test routes are not supposed to ever be accessible in a production environment.
 //
-router.get("/api/v1/ping", verifyToken_1.verifyToken, (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const controller = new ping_1.default();
-    const response = yield controller.getMessage();
-    return res.status(200).send(response);
-}));
+if (process.env.NODE_ENV === 'development') {
+    router.get("/api/v1/ping", (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const controller = new ping_1.default();
+        const response = yield controller.getMessage();
+        return res.status(200).send(response);
+    }));
+}
 //
-// --------------------------------- User routes ---------------------------------   
+// --------------------------------- User routes ---------------------------------
 //
 router.post('/api/v1/user', (req, res) => {
     const controller = new user_1.default();
@@ -105,7 +103,7 @@ router.put('/api/v1/user/:userId', verifyUser_1.verifyUser, (req, res) => __awai
     }
 }));
 //
-// -------------------------------- Session routes -------------------------------   
+// -------------------------------- Session routes -------------------------------
 //
 router.post('/api/v1/session', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const controller = new auth_1.default();
@@ -114,7 +112,7 @@ router.post('/api/v1/session', (req, res) => __awaiter(void 0, void 0, void 0, f
     });
 }));
 //
-// -------------------------------- Service routes -------------------------------   
+// -------------------------------- Service routes -------------------------------
 // FIXME: Service routes are not supposed to ever be accessible in a production environment.
 //
 // This route clears all of the collections defined in the helper class.
@@ -127,4 +125,5 @@ router.get("/api/v1/service/clear", (_req, res) => __awaiter(void 0, void 0, voi
             return res.status(500).json(err);
     });
 }));
+// Default export for the router
 exports.default = router;
