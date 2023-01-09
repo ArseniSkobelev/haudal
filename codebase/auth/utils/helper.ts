@@ -38,8 +38,3 @@ export default class Helper {
         })
     }
 }
-
-export interface IResponse {
-    success: boolean;
-    data: any;
-}

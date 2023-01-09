@@ -1,11 +1,10 @@
 import { User, IUser } from '../models/user';
-import Helper, { IResponse } from '../utils/helper';
+import Helper from '../utils/helper';
 import jwt, { Secret } from 'jsonwebtoken';
 
 export default class UserController {
     public createUser(userData: object, callback: any): any {
         let user = new User(userData);
-        // console.log(user);
 
         const helper = new Helper();
 
@@ -35,24 +34,25 @@ export default class UserController {
         })
     }
 
-    public getUserById(userId: string, callback: any): (IResponse) {
+    public getUserById(userId: string, callback: any): any {
         if (userId) {
             const foundUser = User.findById(userId).exec((err: any, doc: any) => {
                 if (err) throw err;
                 let user = doc.toJSON();
 
-                if (user) {
-                    return callback({ success: true, data: { user: user } })
-                } else {
+                if (!user) {
                     return callback({
-                        success: false, data: {
+                        status: 400, data: {
                             message: "No user has been found with the provided id"
                         }
                     });
                 }
-            });
 
-            return callback({ success: false, data: { message: "Internal Server Error" } })
+                let tempUser = JSON.parse(JSON.stringify(user));
+                let { password_hash, ...foundUser } = tempUser;
+
+                return callback({ status: 200, data: { user: foundUser } })
+            });
         } else {
             return callback({
                 success: false, data: {
@@ -62,37 +62,37 @@ export default class UserController {
         }
     }
 
-    public deleteUser(userId: string, callback: any): (IResponse) {
+    public deleteUser(userId: string, callback: any): any {
         if (userId) {
             User.deleteOne({ _id: userId }).exec((err: any, res: any) => {
                 if (err) throw err;
-                return callback({ success: true, data: { res } });
+                return callback({ status: 204, data: { res } });
             })
         } else {
             return callback({
-                success: false, data: {
+                status: 404, data: {
                     message: "No user id has been provided"
                 }
             })
         }
-        return callback({ success: false, data: { message: "Internal Server Error" } });
     }
 
-    public updateUser(userId: string, newUser: IUser, callback: any): (IResponse) {
+    public updateUser(userId: string, newUser: IUser, callback: any): any {
         User.updateOne({ _id: userId }, newUser, (err: any, doc: any) => {
             if (err) throw err;
             if (doc) {
                 return callback({
-                    success: true, data: {
+                    status: 200, data: {
                         doc
+                    }
+                })
+            } else {
+                return callback({
+                    status: 500, data: {
+                        message: "Internal Server Error"
                     }
                 })
             }
         });
-        return callback({
-            success: false, data: {
-                message: "Internal Server Error"
-            }
-        })
     }
 }

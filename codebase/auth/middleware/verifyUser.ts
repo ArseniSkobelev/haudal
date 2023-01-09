@@ -14,7 +14,7 @@ export const verifyUser = async (req: Request, res: Response, next: NextFunction
         if (decodedData._id === userId) {
             next();
         } else {
-            return res.status(500).json({ success: false, data: { message: "Internal Server Error" } });
+            return res.status(500).json({ data: { message: "Internal Server Error" } });
         }
     });
 }

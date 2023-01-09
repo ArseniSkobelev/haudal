@@ -60,8 +60,8 @@ if (process.env.NODE_ENV === 'development') {
 router.post('/api/v1/user', (req: Request, res: Response) => {
     const controller = new UserController();
     if (req.body.user != undefined) {
-        controller.createUser(req.body.user, (resp: any) => {
-            return res.status(resp.status).json({ data: resp.data });
+        controller.createUser(req.body.user, (data: any) => {
+            return res.status(data.status).json({ data: data.data });
         });
     } else {
         return res.status(500).json({ data: { message: "Internal Server Error" } });
@@ -72,10 +72,10 @@ router.get('/api/v1/user/:userId', verifyUser, async (req: Request, res: Respons
     let controller = new UserController();
     if (req.params.userId != undefined) {
         let response = await controller.getUserById(req.params.userId, (data: any) => {
-            if (data.success) return res.status(200).json(data);
+            return res.status(data.status).json({ data: data.data });
         });
     } else {
-        return res.status(500).json({ success: false, data: { message: "Internal Server Error" } });
+        return res.status(500).json({ data: { message: "Internal Server Error" } });
     }
 });
 
@@ -83,10 +83,10 @@ router.delete('/api/v1/user/:userId', verifyUser, async (req: Request, res: Resp
     let controller = new UserController();
     if (req.params.userId != undefined) {
         let response = await controller.deleteUser(req.params.userId, (data: any) => {
-            if (data.success) return res.status(200).json(data);
+            return res.status(data.status).json({ data: data.data });
         });
     } else {
-        return res.status(500).json({ success: false, data: { message: "Internal Server Error" } });
+        return res.status(500).json({ data: { message: "Internal Server Error" } });
     }
 });
 
@@ -94,10 +94,10 @@ router.put('/api/v1/user/:userId', verifyUser, async (req: Request, res: Respons
     let controller = new UserController();
     if (req.params.userId != undefined) {
         let response = await controller.updateUser(req.params.userId, req.body.user, (data: any) => {
-            if (data.success) return res.status(200).json(data);
+            return res.status(data.status).json({ data: data.data });
         });
     } else {
-        return res.status(500).json({ success: false, data: { message: "Internal Server Error" } });
+        return res.status(500).json({ data: { message: "Internal Server Error" } });
     }
 });
 
