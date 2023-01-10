@@ -1,11 +1,24 @@
+// ------------------------------ Haudal User Model -----------------------------
+//
+//     Developed by:         Arseni Skobelev
+//     Development started:  02.01.2023
+// 
+//     Tags:
+//         User authentication,
+//         Security
+//
+// ------------------------------------------------------------------------------
+
+
+//
+// --------------------- Default configuration and imports ----------------------
+//
 import mongoose, { model, Schema } from 'mongoose';
 
-interface UserLoginData {
-    user_name?: string;
-    email?: string;
-    plain_password: string;
-}
 
+//
+// ----------------------- Interfaces that define a user ------------------------
+//
 interface IUser {
     user_name?: string;
     first_name?: string;
@@ -17,17 +30,10 @@ interface IUser {
     tenant?: string;
 }
 
-interface IUserDocument extends mongoose.Document {
-    user_name?: string;
-    first_name?: string;
-    last_name?: string;
-    email?: string;
-    password_hash?: string;
-    phone_number?: string;
-    is_email_confirmed?: boolean;
-    tenant?: string;
-}
 
+//
+// ------------------------ Main user schema definition -------------------------
+//
 const userSchema = new Schema({
     user_name: {
         type: String,
@@ -70,6 +76,7 @@ const userSchema = new Schema({
         // 'single' - singular user account not connected to a tenant
         // 'joined' - a user account joined to a tenant
         // 'admin' - an admin / tenant admin account
+        // p.s This is yet to be implemented.
         unique: false,
         required: false
     },
@@ -81,6 +88,11 @@ const userSchema = new Schema({
     }
 })
 
+
+//
+// ----------------- Default exports and further configuration ------------------
+//
 const User = model<any>('User', userSchema);
 
-export { User, IUser, UserLoginData, IUserDocument }
+export { User, IUser }
+

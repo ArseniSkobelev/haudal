@@ -1,4 +1,4 @@
-import { UserLoginData, User } from "../models/user";
+import { User } from "../models/user";
 import Helper from '../utils/helper';
 
 export interface HaudalResponse {
@@ -7,7 +7,7 @@ export interface HaudalResponse {
 }
 
 export default class AuthController {
-    public async login(loginData: UserLoginData, callback: any): Promise<any> {
+    public async login(loginData: any, callback: any): Promise<any> {
         const helper = new Helper();
 
         User.findOne({ 'email': loginData.email }, (err: any, result: any) => {
