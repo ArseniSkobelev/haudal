@@ -93,6 +93,8 @@ const userSchema = new Schema({
         default: null,
         sparse: true
     }
+}, {
+    timestamps: true,
 })
 
 
