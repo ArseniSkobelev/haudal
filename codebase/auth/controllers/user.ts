@@ -55,7 +55,7 @@ export default class UserController {
             });
         } else {
             return callback({
-                success: false, data: {
+                status: 404, data: {
                     message: "No user id has been provided"
                 }
             })
