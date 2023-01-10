@@ -32,11 +32,11 @@ const appSchema = new Schema({
         unique: true,
         required: true
     },
-    admin: {
+    admin: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
-    },
+        required: false
+    }],
     url: {
         type: String,
         unique: true,
@@ -55,7 +55,7 @@ const appSchema = new Schema({
         default: null,
         sparse: true
     },
-    isUniversalLoginCompatible: {
+    isUniversalLoginEnabled: {
         type: Boolean,
         unique: false,
         required: false,
