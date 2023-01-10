@@ -3,7 +3,8 @@ import dotenv from 'dotenv';
 import morgan from 'morgan';
 
 import Router from './routes';
-import ExtenalRouter from './routes/external';
+import ExternalRouter from './routes/external';
+import AppRouter from './routes/app';
 import mongoose from 'mongoose';
 
 dotenv.config();
@@ -12,8 +13,7 @@ const app: Express = express();
 
 app.use(morgan('tiny'));
 app.use(express.json());
-app.use(Router);
-app.use(ExtenalRouter);
+app.use(Router, ExternalRouter, AppRouter);
 
 mongoose.connect(process.env.MONGODB_URI || "localhost", {
     authSource: "admin",

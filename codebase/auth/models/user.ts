@@ -85,6 +85,13 @@ const userSchema = new Schema({
         ref: 'Tenant',
         required: false,
         default: null
+    },
+    logo: {
+        type: String,
+        unique: false,
+        required: false,
+        default: null,
+        sparse: true
     }
 })
 
