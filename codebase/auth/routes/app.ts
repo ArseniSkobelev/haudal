@@ -16,6 +16,7 @@
 import express, { Request, Response } from "express";
 import { isValidObjectId } from "mongoose";
 import AppController from "../controllers/app";
+import TokenController from "../controllers/token";
 
 const AppRouter = express.Router();
 
@@ -23,7 +24,7 @@ const _CURRENT_ROUTE_PREFIX = '/api/v1/app'
 
 
 //
-// -------------------------------- External routes -------------------------------
+// ---------------------------------- App routes ---------------------------------
 //
 AppRouter.post(`${_CURRENT_ROUTE_PREFIX}/`, async (req: Request, res: Response) => {
     const controller = new AppController();
@@ -66,6 +67,27 @@ AppRouter.delete(`${_CURRENT_ROUTE_PREFIX}/:id`, async (req: Request, res: Respo
     } else {
         return res.status(500).json({ data: { message: "Internal Server Error" } })
     }
+})
+
+AppRouter.post(`${_CURRENT_ROUTE_PREFIX}/token/`, async (req: Request, res: Response) => {
+    const controller = new TokenController();
+    controller.createToken(req.body.app, (data: any) => {
+        return res.status(data.status).json({ data: data.data });
+    })
+})
+
+AppRouter.get(`${_CURRENT_ROUTE_PREFIX}/token/:id`, async (req: Request, res: Response) => {
+    const controller = new TokenController();
+    controller.findTokensByAppId(req.params.id, (data: any) => {
+        return res.status(data.status).json({ data: data.data });
+    })
+})
+
+AppRouter.delete(`${_CURRENT_ROUTE_PREFIX}/token/:id`, async (req: Request, res: Response) => {
+    const controller = new TokenController();
+    controller.deleteTokenById(req.params.id, (data: any) => {
+        return res.status(data.status).json({ data: data.data });
+    })
 })
 
 

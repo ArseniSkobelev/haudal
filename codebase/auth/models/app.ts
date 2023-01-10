@@ -54,6 +54,13 @@ const appSchema = new Schema({
         required: false,
         default: null,
         sparse: true
+    },
+    isUniversalLoginCompatible: {
+        type: Boolean,
+        unique: false,
+        required: false,
+        deafult: true,
+        sparse: true
     }
 });
 

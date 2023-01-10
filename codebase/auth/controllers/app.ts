@@ -13,12 +13,8 @@
 //
 // --------------------- Default configuration and imports ----------------------
 //
-import { User, IUser } from '../models/user';
-import Helper from '../utils/helper';
-import jwt, { Secret } from 'jsonwebtoken';
 import { App, IAppData } from '../models/app'
 import UserController from './user';
-import { Application } from 'express';
 
 
 export default class AppController {
@@ -29,11 +25,9 @@ export default class AppController {
             let userController = new UserController();
 
             await userController.getUserById(app.admin, (data: any) => {
-                console.log(data);
                 if (data.data.user.hasOwnProperty('_id')) {
                     if (data.data.user.account_type === 'admin') {
                         app.save(async (err: any, res: any) => {
-                            console.log(err, res);
                             if (err && err.code !== 11000) {
                                 return callback({ status: 500, data: { message: "Internal Server Error" } })
                             }
