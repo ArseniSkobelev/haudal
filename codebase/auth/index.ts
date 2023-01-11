@@ -1,25 +1,29 @@
 import express, { Express } from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
+import morganBody from 'morgan-body';
 
-import Router from './routes';
+import UserRouter from './routes';
 import ExternalRouter from './routes/external';
 import AppRouter from './routes/app';
 import SessionRouter from './routes/session';
 import mongoose from 'mongoose';
+import bodyParser from 'body-parser';
 
 dotenv.config();
 
 const app: Express = express();
 
-app.use(morgan('tiny'));
-app.use(express.json());
-app.use(Router, ExternalRouter, AppRouter, SessionRouter);
+app.use(bodyParser.json());
 
-mongoose.connect(process.env.MONGODB_URI || "localhost", {
+morganBody(app);
+
+// app.use(morgan('dev'));
+app.use(express.json());
+app.use(UserRouter, ExternalRouter, AppRouter, SessionRouter);
+
+mongoose.connect(process.env.MONGODB_URI!, {
     authSource: "admin",
-    user: process.env.MONGODB_USER,
-    pass: process.env.MONGODB_PASS,
     connectTimeoutMS: 150000,
     socketTimeoutMS: 90000,
     maxIdleTimeMS: 60000

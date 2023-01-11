@@ -27,7 +27,7 @@ interface IUser {
     password_hash?: string;
     phone_number?: string;
     is_email_confirmed?: boolean;
-    tenant?: string;
+    plain_password?: string;
 }
 
 

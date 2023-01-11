@@ -1,37 +1,65 @@
 import { User, IUser } from '../models/user';
 import Helper from '../utils/helper';
 import jwt, { Secret } from 'jsonwebtoken';
+import MemberController from './member';
+import mongoose from 'mongoose';
+
+export interface INewUser {
+    email?: string;
+    password_hash?: string;
+    account_type?: string;
+    appId?: string;
+}
 
 export default class UserController {
-    public createUser(userData: object, callback: any): any {
-        let user = new User(userData);
+    public createUser(userData: INewUser, callback: any): any {
+        let newUserId = new mongoose.Types.ObjectId();
+        if (userData) {
+            if (userData.hasOwnProperty('account_type')) {
+                if (userData.account_type === 'joined') {
+                    if (userData.appId) {
+                        let member_controller = new MemberController();
+                        member_controller.addMember({ user: newUserId.toString(), app: userData.appId }, (data: any) => {
 
-        const helper = new Helper();
-
-        helper.hashPassword(user.password_hash, (hash: any) => {
-            user.password_hash = hash.data.hash;
-
-            let SECRET_KEY: Secret = process.env.SECRET_KEY!;
-
-            let token = jwt.sign({ _id: user._id, email: user.email }, SECRET_KEY, {
-                expiresIn: '1d'
-            });
-
-            let tempNewUser = JSON.parse(JSON.stringify(user));
-            let { password_hash, ...newUser } = tempNewUser;
-
-            user.save(async (err: any) => {
-                if (err && err.code !== 11000) {
-                    return callback({ status: 500, data: { message: "Internal Server Error" } })
+                        })
+                    } else {
+                        console.log("joined account type but no app provided");
+                    }
                 }
+            }
+            let user = new User(userData);
 
-                if (err && err.code === 11000) {
-                    return callback({ status: 500, data: { message: "Internal Server Error" } })
-                }
+            user._id = newUserId;
 
-                return callback({ status: 201, data: { newUser, token: token } })
-            });
-        })
+            const helper = new Helper();
+
+            helper.hashPassword(user.password_hash, (hash: any) => {
+                user.password_hash = hash.data.hash;
+
+                let SECRET_KEY: Secret = process.env.SECRET_KEY!;
+
+                let token = jwt.sign({ _id: user._id, email: user.email }, SECRET_KEY, {
+                    expiresIn: '1d'
+                });
+
+                let tempNewUser = JSON.parse(JSON.stringify(user));
+                let { plain_password, ...newUser } = tempNewUser;
+
+                user.save(async (err: any) => {
+                    if (err && err.code !== 11000) {
+                        console.log(err);
+                        return callback({ status: 500, data: { message: "Internal Server Error" } })
+                    }
+
+                    if (err && err.code === 11000) {
+                        console.log(err);
+                        return callback({ status: 500, data: { message: "Internal Server Error" } })
+                    }
+
+                    return callback({ status: 201, data: { newUser, token: token } })
+                });
+            })
+        }
     }
 
     public getUserById(userId: string, callback: any): any {

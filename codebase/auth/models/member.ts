@@ -19,8 +19,9 @@ import mongoose, { model, Schema } from 'mongoose';
 //
 // -------------------------------- Interfaces ----------------------------------
 //
-interface IMember {
-
+interface IMemberData {
+    user?: string;
+    app?: string;
 }
 
 
@@ -48,5 +49,5 @@ const memberSchema = new Schema({
 //
 const Member = model<any>('Member', memberSchema);
 
-export { Member }
+export { Member, IMemberData }
 

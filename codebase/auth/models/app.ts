@@ -58,9 +58,8 @@ const appSchema = new Schema({
     isUniversalSigninProtocolEnabled: {
         type: Boolean,
         unique: false,
-        required: false,
+        required: true,
         deafult: true,
-        sparse: true
     }
 });
 

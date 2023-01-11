@@ -14,7 +14,7 @@
 // --------------------- Default configuration and imports ----------------------
 //
 import express, { Request, Response } from "express";
-const router = express.Router();
+const UserRouter = express.Router();
 
 
 //
@@ -35,7 +35,7 @@ import ServiceController from "../controllers/service";
 //
 // -------------------------------- Index routes --------------------------------
 //
-router.get('/api/v1/', async (_req, res) => {
+UserRouter.get('/api/v1/', async (_req, res) => {
     return res.json({ "success": true, "message": `Haudal Authentication Service v${process.env.VERSION}. The application is currently in ${process.env.NODE_ENV}` });
 });
 
@@ -45,7 +45,7 @@ router.get('/api/v1/', async (_req, res) => {
 // FIXME: Test routes are not supposed to ever be accessible in a production environment.
 //
 if (process.env.NODE_ENV === 'development') {
-    router.get("/api/v1/ping", async (_req, res) => {
+    UserRouter.get("/api/v1/ping", async (_req, res) => {
         const controller = new PingController();
         const response = await controller.getMessage();
         return res.status(200).send(response);
@@ -56,7 +56,7 @@ if (process.env.NODE_ENV === 'development') {
 //
 // --------------------------------- User routes ---------------------------------
 //
-router.post('/api/v1/user', (req: Request, res: Response) => {
+UserRouter.post('/api/v1/user', (req: Request, res: Response) => {
     const controller = new UserController();
     if (req.body.user != undefined) {
         controller.createUser(req.body.user, (data: any) => {
@@ -67,7 +67,7 @@ router.post('/api/v1/user', (req: Request, res: Response) => {
     }
 })
 
-router.get('/api/v1/user/:userId', async (req: Request, res: Response) => {
+UserRouter.get('/api/v1/user/:userId', async (req: Request, res: Response) => {
     let controller = new UserController();
     if (req.params.userId != undefined) {
         let response = await controller.getUserById(req.params.userId, (data: any) => {
@@ -78,7 +78,7 @@ router.get('/api/v1/user/:userId', async (req: Request, res: Response) => {
     }
 });
 
-router.delete('/api/v1/user/:userId', async (req: Request, res: Response) => {
+UserRouter.delete('/api/v1/user/:userId', async (req: Request, res: Response) => {
     let controller = new UserController();
     if (req.params.userId != undefined) {
         let response = await controller.deleteUser(req.params.userId, (data: any) => {
@@ -89,7 +89,7 @@ router.delete('/api/v1/user/:userId', async (req: Request, res: Response) => {
     }
 });
 
-router.put('/api/v1/user/:userId', async (req: Request, res: Response) => {
+UserRouter.put('/api/v1/user/:userId', async (req: Request, res: Response) => {
     let controller = new UserController();
     if (req.params.userId != undefined) {
         let response = await controller.updateUser(req.params.userId, req.body.user, (data: any) => {
@@ -107,7 +107,7 @@ router.put('/api/v1/user/:userId', async (req: Request, res: Response) => {
 //
 if (process.env.NODE_ENV === 'development') {
     // This route clears all of the collections defined in the helper class.
-    router.get("/api/v1/service/clear", async (_req, res) => {
+    UserRouter.get("/api/v1/service/clear", async (_req, res) => {
         const controller = new ServiceController();
         const response = await controller.clearCollections((err: any, resp: any) => {
             if (!err) return res.status(200).json({ success: true, data: resp });
@@ -118,4 +118,4 @@ if (process.env.NODE_ENV === 'development') {
 
 
 // Default export for the router
-export default router;
+export default UserRouter;

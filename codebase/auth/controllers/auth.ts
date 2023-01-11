@@ -23,7 +23,7 @@ export default class AuthController {
     public async appLogin(loginData: ILoginData, callback: any): Promise<any> {
         const helper = new Helper();
         if (loginData.email && loginData.plain_password) {
-            helper.getAppData(loginData.appId!, (appData: any) => {
+            helper.getAppData(loginData.appId!.toString(), (appData: any) => {
                 helper.getUserDataByEmail(loginData.email!, (userData: any) => {
                     switch (userData.account_type) {
                         case "joined":
