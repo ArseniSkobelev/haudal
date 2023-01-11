@@ -25,7 +25,17 @@ export default class AuthController {
         const helper = new Helper();
         if (loginData.email && loginData.plain_password) {
             helper.getAppData(loginData.appId!, (appData: any) => {
-                console.log(appData);
+
+            })
+            helper.getUserDataByEmail(loginData.email, (userData: any) => {
+                switch (userData.account_type) {
+                    case "joined":
+                        break;
+                    case "universal":
+                        break;
+                    default:
+                        return callback({ status: 403, data: { message: "This account is an administrator account and is therefore denied access to apps outside off the dashboard." } })
+                }
             })
         } else {
             return callback({ status: 401, data: {} });
@@ -39,9 +49,9 @@ export default class AuthController {
                 if (userData.account_type === 'admin') {
                     helper.isPasswordCorrect(userData.password_hash, loginData.plain_password!, (data: any) => {
                         if (data) {
-                            console.log("----------------------");
-                            console.log("logged in to the dashboard");
-                            console.log("----------------------");
+                            helper.createToken(userData, (token: string) => {
+                                return callback({ status: 200, data: { message: `Welcome back, ${userData.first_name || userData.email}!`, token: token } })
+                            })
                         } else {
                             return callback({ status: 401, data: { message: "Incorrect username, email or password supplied." } })
                         }

@@ -67,7 +67,7 @@ router.post('/api/v1/user', (req: Request, res: Response) => {
     }
 })
 
-router.get('/api/v1/user/:userId', verifyUser, async (req: Request, res: Response) => {
+router.get('/api/v1/user/:userId', async (req: Request, res: Response) => {
     let controller = new UserController();
     if (req.params.userId != undefined) {
         let response = await controller.getUserById(req.params.userId, (data: any) => {
@@ -78,7 +78,7 @@ router.get('/api/v1/user/:userId', verifyUser, async (req: Request, res: Respons
     }
 });
 
-router.delete('/api/v1/user/:userId', verifyUser, async (req: Request, res: Response) => {
+router.delete('/api/v1/user/:userId', async (req: Request, res: Response) => {
     let controller = new UserController();
     if (req.params.userId != undefined) {
         let response = await controller.deleteUser(req.params.userId, (data: any) => {
@@ -89,7 +89,7 @@ router.delete('/api/v1/user/:userId', verifyUser, async (req: Request, res: Resp
     }
 });
 
-router.put('/api/v1/user/:userId', verifyUser, async (req: Request, res: Response) => {
+router.put('/api/v1/user/:userId', async (req: Request, res: Response) => {
     let controller = new UserController();
     if (req.params.userId != undefined) {
         let response = await controller.updateUser(req.params.userId, req.body.user, (data: any) => {

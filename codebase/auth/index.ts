@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import Router from './routes';
 import ExternalRouter from './routes/external';
 import AppRouter from './routes/app';
+import SessionRouter from './routes/session';
 import mongoose from 'mongoose';
 
 dotenv.config();
@@ -13,7 +14,7 @@ const app: Express = express();
 
 app.use(morgan('tiny'));
 app.use(express.json());
-app.use(Router, ExternalRouter, AppRouter);
+app.use(Router, ExternalRouter, AppRouter, SessionRouter);
 
 mongoose.connect(process.env.MONGODB_URI || "localhost", {
     authSource: "admin",
