@@ -34,7 +34,7 @@ export default class Helper {
         return callback(token);
     }
 
-    public async getAppData(appId: string, callback: any): Promise<any> {
+    public getAppData(appId: string, callback: any): any {
         App.findById(appId).exec((err, doc) => {
             if (err) return callback(err);
             if (doc) {

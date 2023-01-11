@@ -16,7 +16,7 @@ const app: Express = express();
 
 app.use(bodyParser.json());
 
-morganBody(app);
+// morganBody(app);
 
 // app.use(morgan('dev'));
 app.use(express.json());

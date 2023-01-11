@@ -8,26 +8,14 @@ export interface INewUser {
     email?: string;
     password_hash?: string;
     account_type?: string;
-    appId?: string;
+    app?: string;
 }
 
 export default class UserController {
     public createUser(userData: INewUser, callback: any): any {
         let newUserId = new mongoose.Types.ObjectId();
         if (userData) {
-            if (userData.hasOwnProperty('account_type')) {
-                if (userData.account_type === 'joined') {
-                    if (userData.appId) {
-                        let member_controller = new MemberController();
-                        member_controller.addMember({ user: newUserId.toString(), app: userData.appId }, (data: any) => {
-
-                        })
-                    } else {
-                        console.log("joined account type but no app provided");
-                    }
-                }
-            }
-            let user = new User(userData);
+            let user = new User({ email: userData.email, password_hash: userData.password_hash, account_type: userData.account_type });
 
             user._id = newUserId;
 
@@ -53,12 +41,18 @@ export default class UserController {
 
                     if (err && err.code === 11000) {
                         console.log(err);
-                        return callback({ status: 500, data: { message: "Internal Server Error" } })
+                        return callback({ status: 409, data: { message: "User with the provided email already exists" } })
                     }
 
-                    return callback({ status: 201, data: { newUser, token: token } })
+                    const member_controller = new MemberController();
+
+                    member_controller.addMember({ user: newUser, app: userData.app }, (memberData: any) => {
+                        return callback({ status: memberData.status, data: { newUser, token: token, data: memberData.data } })
+                    });
                 });
             })
+        } else {
+            return callback({ status: 401, data: { message: "No user data has been provided." } })
         }
     }
 
