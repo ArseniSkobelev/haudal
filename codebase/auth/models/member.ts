@@ -19,72 +19,24 @@ import mongoose, { model, Schema } from 'mongoose';
 //
 // -------------------------------- Interfaces ----------------------------------
 //
-interface IUser {
-    user_name?: string;
-    first_name?: string;
-    last_name?: string;
-    email?: string;
-    password_hash?: string;
-    phone_number?: string;
-    is_email_confirmed?: boolean;
-    tenant?: string;
+interface IMember {
+
 }
 
 
 //
 // ----------------------------- Schema definition ------------------------------
 //
-const userSchema = new Schema({
-    user_name: {
-        type: String,
-        unique: true,
-        sparse: true
+const memberSchema = new Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
-    first_name: {
-        type: String,
-        required: false
-    },
-    last_name: {
-        type: String,
-        required: false
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    password_hash: {
-        type: String,
-        required: true,
-        unique: false
-    },
-    phone_number: {
-        type: Number,
-        required: false,
-        unique: true,
-        sparse: true
-    },
-    is_email_confirmed: {
-        type: Boolean,
-        default: false,
-        unique: false
-    },
-    account_type: {
-        type: String,
-        enum: ['universal', 'joined', 'admin'],
-        default: 'universal',
-        // 'universal' - a universal user account able to login into any application that supports Universal Signin Protocol (USP)
-        // 'joined' - a user account joined to an application
-        // 'admin' - an application admin account
-        unique: false,
-        required: false
-    },
-    avatar: {
-        type: String,
-        unique: false,
-        required: false,
-        default: null,
-        sparse: true
+    app: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'App',
+        required: true
     }
 }, {
     timestamps: true,
@@ -94,7 +46,7 @@ const userSchema = new Schema({
 //
 // ----------------- Default exports and further configuration ------------------
 //
-const User = model<any>('User', userSchema);
+const Member = model<any>('Member', memberSchema);
 
-export { User, IUser }
+export { Member }
 

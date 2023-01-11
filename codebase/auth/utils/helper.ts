@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import jwt, { Secret } from 'jsonwebtoken';
 import { ObjectId } from 'mongoose';
 import { App } from '../models/app';
+import { Member } from '../models/member';
 import { User } from '../models/user';
 
 dotenv.config();
@@ -58,6 +59,16 @@ export default class Helper {
                 return callback(doc);
             }
         });
+    }
+
+    public async getAppMembers(appId: ObjectId, callback: any): Promise<any> {
+        let members: any = [];
+        Member.find({ appId: appId }, (err: any, docs: any) => {
+            docs.forEach((member: any) => {
+                members.push(member);
+            });
+            return callback(members);
+        })
     }
 
     // TODO REMOVE THIS BEFORE PRODUCTION. DEV FUNCTIONALITY ONLY.
