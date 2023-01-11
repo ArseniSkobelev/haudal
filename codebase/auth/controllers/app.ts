@@ -29,10 +29,12 @@ export default class AppController {
                     if (data.data.user.account_type === 'admin') {
                         app.save(async (err: any, res: any) => {
                             if (err && err.code !== 11000) {
+                                console.log(err);
                                 return callback({ status: 500, data: { message: "Internal Server Error" } })
                             }
 
                             if (err && err.code === 11000) {
+                                console.log(err);
                                 return callback({ status: 500, data: { message: "Internal Server Error" } })
                             }
 

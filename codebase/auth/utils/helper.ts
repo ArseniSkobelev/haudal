@@ -34,7 +34,7 @@ export default class Helper {
         return callback(token);
     }
 
-    public async getAppData(appId: ObjectId, callback: any): Promise<any> {
+    public getAppData(appId: string, callback: any): any {
         App.findById(appId).exec((err, doc) => {
             if (err) return callback(err);
             if (doc) {
@@ -43,7 +43,7 @@ export default class Helper {
         })
     }
 
-    public async getUserDataById(userId: ObjectId, callback: any): Promise<any> {
+    public async getUserDataById(userId: string, callback: any): Promise<any> {
         User.findById(userId).exec((err, doc) => {
             if (err) return callback(err);
             if (doc) {
@@ -61,7 +61,7 @@ export default class Helper {
         });
     }
 
-    public async getAppMembers(appId: ObjectId, callback: any): Promise<any> {
+    public async getAppMembers(appId: string, callback: any): Promise<any> {
         let members: any = [];
         Member.find({ appId: appId }, (err: any, docs: any) => {
             docs.forEach((member: any) => {

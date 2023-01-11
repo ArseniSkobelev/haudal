@@ -17,6 +17,7 @@ import express, { Request, Response } from "express";
 import { isValidObjectId } from "mongoose";
 import AppController from "../controllers/app";
 import TokenController from "../controllers/token";
+import MemberController from "../controllers/member";
 
 const AppRouter = express.Router();
 
@@ -86,6 +87,13 @@ AppRouter.get(`${_CURRENT_ROUTE_PREFIX}/token/:id`, async (req: Request, res: Re
 AppRouter.delete(`${_CURRENT_ROUTE_PREFIX}/token/:id`, async (req: Request, res: Response) => {
     const controller = new TokenController();
     controller.deleteTokenById(req.params.id, (data: any) => {
+        return res.status(data.status).json({ data: data.data });
+    })
+})
+
+AppRouter.post(`${_CURRENT_ROUTE_PREFIX}/member/`, async (req: any, res: any) => {
+    const controller = new MemberController();
+    controller.addMember(req.body.member, (data: any) => {
         return res.status(data.status).json({ data: data.data });
     })
 })
