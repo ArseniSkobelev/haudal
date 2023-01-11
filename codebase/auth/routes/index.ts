@@ -29,7 +29,6 @@ import { verifyUser } from "../middleware/verifyUser";
 //
 import PingController from "../controllers/ping";
 import UserController from "../controllers/user";
-import AuthController from "../controllers/auth";
 import ServiceController from "../controllers/service";
 
 
