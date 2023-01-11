@@ -55,7 +55,7 @@ const appSchema = new Schema({
         default: null,
         sparse: true
     },
-    isUniversalLoginEnabled: {
+    isUniversalSigninProtocolEnabled: {
         type: Boolean,
         unique: false,
         required: false,

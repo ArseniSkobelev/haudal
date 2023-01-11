@@ -103,17 +103,6 @@ router.put('/api/v1/user/:userId', verifyUser, async (req: Request, res: Respons
 
 
 //
-// -------------------------------- Session routes -------------------------------
-//
-router.post('/api/v1/session', async (req: Request, res: Response) => {
-    const controller = new AuthController();
-    let response = await controller.login(req.body.login_data, (result: any) => {
-        return res.json(result);
-    });
-})
-
-
-//
 // -------------------------------- Service routes -------------------------------
 // FIXME: Service routes are not supposed to ever be accessible in a production environment.
 //

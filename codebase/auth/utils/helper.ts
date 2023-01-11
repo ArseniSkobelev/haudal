@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import jwt, { Secret } from 'jsonwebtoken';
+import { ObjectId } from 'mongoose';
+import { App } from '../models/app';
 import { User } from '../models/user';
 
 dotenv.config();
@@ -31,7 +33,34 @@ export default class Helper {
         return callback(token);
     }
 
-    // TODO REMOVE THIS BEFORE ANY PRODUCTION. TEST FUNCTIONALITY ONLY.
+    public async getAppData(appId: ObjectId, callback: any): Promise<any> {
+        App.findById(appId).exec((err, doc) => {
+            if (err) return callback(err);
+            if (doc) {
+                return callback(doc);
+            }
+        })
+    }
+
+    public async getUserDataById(userId: ObjectId, callback: any): Promise<any> {
+        User.findById(userId).exec((err, doc) => {
+            if (err) return callback(err);
+            if (doc) {
+                return callback(doc);
+            }
+        });
+    }
+
+    public async getUserDataByEmail(email: string, callback: any): Promise<any> {
+        User.findOne({ email: email }, (err: any, doc: any) => {
+            if (err) return callback(err);
+            if (doc) {
+                return callback(doc);
+            }
+        });
+    }
+
+    // TODO REMOVE THIS BEFORE PRODUCTION. DEV FUNCTIONALITY ONLY.
     public async clearCollections(callback: any): Promise<any> {
         User.deleteMany({}, (err: any, res: any) => {
             callback(err, res);

@@ -1,7 +1,7 @@
 // ------------------------------ Haudal User Model -----------------------------
 //
 //     Developed by:         Arseni Skobelev
-//     Development started:  02.01.2023
+//     Development started:  11.01.2023
 // 
 //     Tags:
 //         User authentication,
