@@ -46,9 +46,13 @@ export default class UserController {
 
                     const member_controller = new MemberController();
 
-                    member_controller.addMember({ user: newUser, app: userData.app }, (memberData: any) => {
-                        return callback({ status: memberData.status, data: { newUser, token: token, data: memberData.data } })
-                    });
+                    if (newUser.account_type === 'admin') {
+                        return callback({ status: 201, data: { newUser, token } })
+                    } else {
+                        member_controller.addMember({ user: newUser, app: userData.app }, (memberData: any) => {
+                            return callback({ status: memberData.status, data: { newUser, token: token, data: memberData.data } })
+                        });
+                    }
                 });
             })
         } else {
