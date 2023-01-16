@@ -3,6 +3,7 @@ import Helper from '../utils/helper';
 import jwt, { Secret } from 'jsonwebtoken';
 import MemberController from './member';
 import mongoose from 'mongoose';
+import { triggerAsyncId } from 'async_hooks';
 
 export interface INewUser {
     email?: string;
@@ -33,27 +34,31 @@ export default class UserController {
                 let tempNewUser = JSON.parse(JSON.stringify(user));
                 let { plain_password, ...newUser } = tempNewUser;
 
-                user.save(async (err: any) => {
-                    if (err && err.code !== 11000) {
-                        console.log(err);
-                        return callback({ status: 500, data: { message: "Internal Server Error" } })
-                    }
+                try {
+                    user.save(async (err: any) => {
+                        if (err && err.code !== 11000) {
+                            console.log(err);
+                            return callback({ status: 500, data: { message: "Internal Server Error" } })
+                        }
 
-                    if (err && err.code === 11000) {
-                        console.log(err);
-                        return callback({ status: 409, data: { message: "User with the provided email already exists" } })
-                    }
+                        if (err && err.code === 11000) {
+                            console.log(err);
+                            return callback({ status: 409, data: { message: "User with the provided email already exists" } })
+                        }
 
-                    const member_controller = new MemberController();
+                        const member_controller = new MemberController();
 
-                    if (newUser.account_type === 'admin') {
-                        return callback({ status: 201, data: { newUser, token } })
-                    } else {
-                        member_controller.addMember({ user: newUser, app: userData.app }, (memberData: any) => {
-                            return callback({ status: memberData.status, data: { newUser, token: token, data: memberData.data } })
-                        });
-                    }
-                });
+                        if (newUser.account_type === 'admin') {
+                            return callback({ status: 201, data: { newUser, token } })
+                        } else {
+                            member_controller.addMember({ user: newUser, app: userData.app }, (memberData: any) => {
+                                return callback({ status: memberData.status, data: { newUser, token: token, data: memberData.data } })
+                            });
+                        }
+                    });
+                } catch (error) {
+                    return callback({ status: 500, data: { message: "Internal Server Error" } })
+                }
             })
         } else {
             return callback({ status: 401, data: { message: "No user data has been provided." } })

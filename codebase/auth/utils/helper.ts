@@ -51,7 +51,8 @@ export default class Helper {
         });
     }
 
-    public async getUserDataByEmail(email: string, callback: any): Promise<any> {
+    public getUserDataByEmail(email: string, callback: any): any {
+        console.log(email);
         User.findOne({ email: email }, (err: any, doc: any) => {
             if (err) return callback(err);
             if (doc) {
