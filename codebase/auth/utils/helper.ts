@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import jwt, { Secret } from 'jsonwebtoken';
-import { ObjectId } from 'mongoose';
 import { App } from '../models/app';
 import { Member } from '../models/member';
 import { User } from '../models/user';

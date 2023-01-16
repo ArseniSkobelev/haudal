@@ -47,4 +47,21 @@ export default class MemberController {
             }
         })
     }
+
+    public findMembersByAppId(appData: any, callback: any) {
+        if (appData) {
+            let foundMembers: any = [];
+
+            Member.find({ app: appData.app }, (err: any, members: any) => {
+                if (members.length > 0) {
+                    members.forEach((member: any) => {
+                        foundMembers.push(member)
+                    });
+                    return callback({ status: 200, data: { foundMembers } })
+                } else {
+                    return callback({ status: 404, data: { message: "No members found" } })
+                }
+            })
+        }
+    }
 }

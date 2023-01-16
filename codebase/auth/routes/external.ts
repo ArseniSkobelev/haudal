@@ -24,7 +24,7 @@ const _CURRENT_ROUTE_PREFIX = '/api/v1/external'
 //
 // -------------------------------- External routes -------------------------------
 //
-ExternalRouter.get(`${_CURRENT_ROUTE_PREFIX}/session/:appId`, async (req: Request, res: Response) => {
+ExternalRouter.get(`${_CURRENT_ROUTE_PREFIX}/:appId`, async (req: Request, res: Response) => {
     // console.log(__dirname);
     return res.sendFile(path.join(__dirname, '/static/login/login.html'))
 });
