@@ -9,6 +9,7 @@ import AppRouter from './routes/app';
 import SessionRouter from './routes/session';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -16,9 +17,10 @@ const app: Express = express();
 
 app.use(bodyParser.json());
 
-// morganBody(app);
+morganBody(app);
 
 // app.use(morgan('dev'));
+app.use(cors())
 app.use(express.json());
 app.use(UserRouter, ExternalRouter, AppRouter, SessionRouter);
 

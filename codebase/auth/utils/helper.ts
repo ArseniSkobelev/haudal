@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import jwt, { Secret } from 'jsonwebtoken';
-import { ObjectId } from 'mongoose';
 import { App } from '../models/app';
 import { Member } from '../models/member';
 import { User } from '../models/user';
@@ -52,7 +51,8 @@ export default class Helper {
         });
     }
 
-    public async getUserDataByEmail(email: string, callback: any): Promise<any> {
+    public getUserDataByEmail(email: string, callback: any): any {
+        console.log(email);
         User.findOne({ email: email }, (err: any, doc: any) => {
             if (err) return callback(err);
             if (doc) {

@@ -17,8 +17,8 @@ import mongoose, { model, ObjectId, Schema } from 'mongoose';
 
 
 interface ITokenData {
-    token: string;
-    appId: ObjectId;
+    app: string;
+    expirationTime?: string;
 }
 
 

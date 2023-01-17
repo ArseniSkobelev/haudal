@@ -1,15 +1,14 @@
-import { ObjectId } from "mongoose";
 import Helper from '../utils/helper';
 
 export interface ILoginData {
     email?: string;
     plain_password?: string;
-    appId?: ObjectId;
+    appId?: string;
 }
 
 export default class AuthController {
     public async loginHandler(data: ILoginData, callback: any): Promise<any> {
-        if (data.appId) {
+        if (data.hasOwnProperty('appId')) {
             await this.appLogin(data, (data: any) => {
                 return callback(data);
             });
@@ -64,10 +63,13 @@ export default class AuthController {
 
     public async dashboardLogin(loginData: ILoginData, callback: any): Promise<any> {
         const helper = new Helper();
+        console.log(loginData.email);
         if (loginData.email && loginData.plain_password) {
             helper.getUserDataByEmail(loginData.email, (userData: any) => {
+                console.log(userData);
                 if (userData.account_type === 'admin') {
                     helper.isPasswordCorrect(userData.password_hash, loginData.plain_password!, (data: any) => {
+                        console.log(data);
                         if (data) {
                             helper.createToken(userData, (token: string) => {
                                 return callback({ status: 200, data: { message: `Welcome back, ${userData.first_name || userData.email}!`, token: token } })

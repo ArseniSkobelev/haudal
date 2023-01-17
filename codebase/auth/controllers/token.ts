@@ -14,19 +14,21 @@
 // --------------------- Default configuration and imports ----------------------
 //
 import { Token, ITokenData } from '../models/token'
-import UserController from './user';
-import { v4 as uuidv4 } from 'uuid';
-import { IAppData } from '../models/app';
+import jwt, { Secret } from 'jsonwebtoken';
 
 
 export default class TokenController {
     public async createToken(tokenData: ITokenData, callback: any): Promise<any> {
         if (tokenData != undefined) {
-            let token = new Token(tokenData);
+            let SECRET_KEY: Secret = process.env.SECRET_KEY!;
 
-            token.token = uuidv4();
+            let token = jwt.sign({ app: tokenData.app }, SECRET_KEY, {
+                expiresIn: tokenData.expirationTime || "365d"
+            });
 
-            await token.save((err: any, res: any) => {
+            let saveToken = new Token({ token: token, appId: tokenData.app });
+
+            await saveToken.save((err: any, res: any) => {
                 if (err) throw err;
                 return callback({ status: 200, data: res })
             })
