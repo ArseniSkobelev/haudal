@@ -58,6 +58,22 @@ export default class TokenController {
         }
     }
 
+    public async verifyAppToken(token: string, callback: any): Promise<any> {
+        if (token) {
+            Token.find({ token: token }).exec((err: any, docs: any) => {
+                if (docs.length > 0) {
+                    if (docs.includes(token)) {
+                        return callback({ status: 200, data: { valid: true } })
+                    } else {
+                        return callback({ status: 404, data: { valid: false } })
+                    }
+                } else {
+                    return callback({ status: 404, data: { valid: false } })
+                }
+            })
+        }
+    }
+
     public async deleteTokenById(tokenId: string, callback: any): Promise<any> {
         if (tokenId) {
             Token.deleteOne({ _id: tokenId }).exec((err: any, res: any) => {
