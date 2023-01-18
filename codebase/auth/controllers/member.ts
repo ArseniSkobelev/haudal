@@ -1,5 +1,4 @@
-import mongoose from "mongoose";
-import { IMemberData, Member } from "../models/member";
+import { Member } from "../models/member";
 import Helper from "../utils/helper";
 
 export default class MemberController {

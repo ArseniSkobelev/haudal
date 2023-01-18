@@ -2,7 +2,6 @@ import express, { Express } from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import morganBody from 'morgan-body';
-
 import UserRouter from './routes';
 import ExternalRouter from './routes/external';
 import AppRouter from './routes/app';
@@ -29,7 +28,7 @@ mongoose.connect(process.env.MONGODB_URI!, {
     connectTimeoutMS: 150000,
     socketTimeoutMS: 90000,
     maxIdleTimeMS: 60000
-}, (err) => {
+}, (err) => {``
     if (err) return console.error(err);
     else {
         console.log("👾 [Haudal | Auth] Connection to MongoDB established successfully");

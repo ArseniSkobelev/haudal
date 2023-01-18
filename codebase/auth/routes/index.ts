@@ -56,10 +56,10 @@ if (process.env.NODE_ENV === 'development') {
 //
 // --------------------------------- User routes ---------------------------------
 //
-UserRouter.post('/api/v1/user', (req: Request, res: Response) => {
+UserRouter.post('/api/v1/user', async (req: Request, res: Response) => {
     const controller = new UserController();
     if (req.body.user != undefined) {
-        controller.createUser(req.body.user, (data: any) => {
+        await controller.createUser(req.body.user, (data: any) => {
             return res.status(data.status).json({ data: data.data });
         });
     } else {
@@ -70,7 +70,7 @@ UserRouter.post('/api/v1/user', (req: Request, res: Response) => {
 UserRouter.get('/api/v1/user/:userId', async (req: Request, res: Response) => {
     let controller = new UserController();
     if (req.params.userId != undefined) {
-        let response = await controller.getUserById(req.params.userId, (data: any) => {
+        await controller.getUserById(req.params.userId, (data: any) => {
             return res.status(data.status).json({ data: data.data });
         });
     } else {
@@ -81,7 +81,7 @@ UserRouter.get('/api/v1/user/:userId', async (req: Request, res: Response) => {
 UserRouter.delete('/api/v1/user/:userId', async (req: Request, res: Response) => {
     let controller = new UserController();
     if (req.params.userId != undefined) {
-        let response = await controller.deleteUser(req.params.userId, (data: any) => {
+        await controller.deleteUser(req.params.userId, (data: any) => {
             return res.status(data.status).json({ data: data.data });
         });
     } else {
@@ -92,7 +92,7 @@ UserRouter.delete('/api/v1/user/:userId', async (req: Request, res: Response) =>
 UserRouter.put('/api/v1/user/:userId', async (req: Request, res: Response) => {
     let controller = new UserController();
     if (req.params.userId != undefined) {
-        let response = await controller.updateUser(req.params.userId, req.body.user, (data: any) => {
+        await controller.updateUser(req.params.userId, req.body.user, (data: any) => {
             return res.status(data.status).json({ data: data.data });
         });
     } else {

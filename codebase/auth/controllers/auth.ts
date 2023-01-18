@@ -8,7 +8,7 @@ export interface ILoginData {
 
 export default class AuthController {
     public async loginHandler(data: ILoginData, callback: any): Promise<any> {
-        if (data.hasOwnProperty('appId')) {
+        if (data.hasOwnProperty('token')) {
             await this.appLogin(data, (data: any) => {
                 return callback(data);
             });
