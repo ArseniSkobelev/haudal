@@ -18,37 +18,56 @@ var sessionCollection *mongo.Collection = db.GetCollection(db.DB, "sessions")
 func Login(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	u := new(models.LoginData)
+	var u models.LoginData
 	var foundUser models.User
 
-	if err := c.BodyParser(u); err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(responses.UserResponse{Status: fiber.StatusInternalServerError, Message: "Error", Data: &fiber.Map{"data": err.Error()}})
+	if err := c.BodyParser(&u); err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.UserResponse{Status: fiber.StatusInternalServerError, Message: "Error", Data: &fiber.Map{"data": ""}})
 	}
 
-	err := userCollection.FindOne(ctx, bson.M{"email": u.Email}).Decode(&foundUser)
+	u.Serialize()
+
+	err := userCollection.FindOne(ctx, bson.M{"$and": []bson.M{
+		{"email": u.Email},
+		{"user_type": u.UserType.String()},
+	}}).Decode(&foundUser)
 
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(responses.UserResponse{Status: fiber.StatusUnauthorized, Message: "Incorrect username and/or password provided", Data: &fiber.Map{"data": err.Error()}})
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.UserResponse{Status: fiber.StatusUnauthorized, Message: "Incorrect username and/or password provided", Data: &fiber.Map{"data": ""}})
 	}
 
 	err = helpers.IsPasswordValid(foundUser.PasswordHash, u.Password)
 
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(responses.UserResponse{Status: fiber.StatusInternalServerError, Message: "Error", Data: &fiber.Map{"data": err.Error()}})
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.UserResponse{Status: fiber.StatusInternalServerError, Message: "Error", Data: &fiber.Map{"data": ""}})
 	}
 
-	token := helpers.CreateJwtToken(foundUser.Email, foundUser.FirstName, foundUser.LastName)
+	token := helpers.CreateJwtToken(foundUser.Email, foundUser.UserType.String())
+
+	uid := helpers.GetUserIdByEmail(ctx, foundUser.Email, u.UserType.String())
 
 	s := models.Session{
 		JWT:    token,
-		UserID: helpers.GetUserIdByEmail(ctx, foundUser.Email),
+		UserID: uid,
 	}
 
-	result, err := sessionCollection.InsertOne(ctx, s)
+	_, err = sessionCollection.DeleteOne(ctx, bson.M{"user_id": uid})
 
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusInternalServerError, Message: "Unable to create session", Data: token, IsAuthorized: false})
 	}
 
-	return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusOK, Message: "Ok", Data: result, IsAuthorized: true})
+	_, err = sessionCollection.InsertOne(ctx, s)
+
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusInternalServerError, Message: "Unable to create session", Data: token, IsAuthorized: false})
+	}
+
+	return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusOK, Message: "Ok", Data: token, IsAuthorized: true})
 }
+
+// func GetSession(c *fiber.Ctx) error {
+// 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+// 	defer cancel()
+
+// }

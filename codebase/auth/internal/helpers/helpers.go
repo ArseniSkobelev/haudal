@@ -3,6 +3,7 @@ package helpers
 import (
 	"context"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/ArseniSkobelev/haudal/internal/db"
@@ -22,7 +23,7 @@ func HashPassword(password string, cost int) string {
 	hp, err := bcrypt.GenerateFromPassword([]byte(password), cost)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	return string(hp)
@@ -33,27 +34,35 @@ func IsPasswordValid(hp string, p string) error {
 	return err
 }
 
-func CreateJwtToken(email string, fn string, ln string) string {
+func CreateJwtToken(email string, user_type string) string {
+	max_age, err := strconv.ParseInt(env.GetEnvValue("SESSION_MAX_AGE", env.DEV), 10, 64)
+
+	if err != nil {
+		return ""
+	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_email":      email,
-		"user_first_name": fn,
-		"user_last_name":  ln,
-		"exp":             jwt.NewNumericDate(time.Unix(time.Now().Unix()+3600, 0)),
+		"user_email": email,
+		"user_type":  user_type,
+		"exp":        time.Now().Unix() + max_age,
 	})
 
 	tokenString, err := token.SignedString([]byte(env.GetEnvValue("SECRET_KEY", env.DEV)))
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	return tokenString
 }
 
-func GenerateAPIKey() (interface{}, error) {
+func GenerateAPIKey(uid string, appName string) (interface{}, error) {
+
 	return models.APIKey{
-		AccessToken:  uuid.New().String(),
-		RefreshToken: uuid.New().String(),
+		AccessToken: uuid.New().String(),
+		UserID:      uid,
+		AppName:     appName,
+		// RefreshToken: uuid.New().String(),
 	}, nil
 }
 
@@ -64,13 +73,18 @@ func GetAuthToken(c *fiber.Ctx) string {
 	return ""
 }
 
-func GetUserIdByEmail(ctx context.Context, email string) string {
+func GetUserIdByEmail(ctx context.Context, email string, user_type string) string {
 	var id models.Id
 
-	err := userCollection.FindOne(ctx, bson.M{"email": email}).Decode(&id)
+	// err := userCollection.FindOne(ctx, bson.M{"email": email}).Decode(&id)
+
+	err := userCollection.FindOne(ctx, bson.M{"$and": []bson.M{
+		{"email": email},
+		{"user_type": user_type},
+	}}).Decode(&id)
 
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Println(err.Error())
 		return ""
 	}
 

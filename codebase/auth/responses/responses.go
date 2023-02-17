@@ -24,7 +24,3 @@ type KeyResponse struct {
 	IsAuthorized bool          `json:"is_authorized"`
 	Key          models.APIKey `json:"key"`
 }
-
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
