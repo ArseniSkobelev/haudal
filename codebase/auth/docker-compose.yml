@@ -7,7 +7,7 @@ services:
     ports:
       - "19000:19000" # !! has to match the API_PORT env
     volumes:
-      - <api_data_storage>:/usr/src/haudal-auth
+      - <api_data_storage>:/usr/src/haudal-authxwxw
     command: go run cmd/app/main.go -b 0.0.0.0
     environment:
       SECRET_KEY: <secret_key>
