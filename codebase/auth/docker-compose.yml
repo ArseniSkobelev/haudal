@@ -1,0 +1,26 @@
+---
+version: '3.8'
+
+services:
+  haudal-auth-api:
+    image: haudal-auth:latest
+    ports:
+      - "19000:19000" # !! has to match the API_PORT env
+    volumes:
+      - <api_data_storage>:/usr/src/haudal-auth
+    command: go run cmd/app/main.go -b 0.0.0.0
+    environment:
+      SECRET_KEY: <secret_key>
+      MONGO_URI: "mongodb://haudal-auth-db:27017/haudal-auth?authSource=admin" # should not be changed if used with provided database
+      API_PORT: 19000
+    depends_on:
+      - haudal-auth-db
+  haudal-auth-db:
+    image: mongo:latest
+    container_name: "haudal-auth-db"
+    restart: always
+    volumes:
+      - <mongodb_data_path>:/data/db
+    environment:
+      MONGODB_INITDB_ROOT_USERNAME: <root_username>
+      MONGODB_INITDB_ROOT_PASSWORD: <root_password>
