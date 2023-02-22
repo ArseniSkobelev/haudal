@@ -7,4 +7,5 @@ import (
 
 func UserRoute(app *fiber.App) {
 	app.Post("/api/v1/user", controllers.CreateUser)
+	app.Get("/api/v1/user", controllers.GetUser)
 }

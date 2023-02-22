@@ -13,7 +13,7 @@ const (
 
 type User struct {
 	Email        string    `bson:"email" json:"email,omitempty" validate:"required"`
-	PasswordHash string    `bson:"password_hash" json:"password_hash,omitempty" validate:"required"`
+	PasswordHash string    `bson:"password_hash" json:"password_hash" validate:"required"`
 	CreatedAt    time.Time `bson:"created_at" json:"created_at" bson:"created_at"`
 	UserType     UserType  `bson:"user_type" json:"user_type"`
 }

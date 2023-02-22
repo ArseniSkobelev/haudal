@@ -24,3 +24,9 @@ type KeyResponse struct {
 	IsAuthorized bool          `json:"is_authorized"`
 	Key          models.APIKey `json:"key"`
 }
+
+type UserDetailsResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Email   string `json:"email"`
+}
