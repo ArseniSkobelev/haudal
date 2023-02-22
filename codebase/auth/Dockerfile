@@ -12,3 +12,11 @@ ENV SESSION_MAX_AGE=3600
 
 COPY . .
 RUN go mod tidy
+
+WORKDIR /usr/src/haudal-auth/cmd/app
+
+RUN go build -o /haudal-auth
+
+EXPOSE ${API_PORT}
+
+CMD [ "/haudal-auth" ]
