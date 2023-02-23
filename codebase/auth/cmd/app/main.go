@@ -21,6 +21,7 @@ func main() {
 
 	app.Get("/swagger/*", swagger.HandlerDefault)
 
+	routes.IndexRoute(app)
 	routes.UserRoute(app)
 	routes.LoginRoute(app)
 	routes.APIKeyRoute(app)

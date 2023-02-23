@@ -30,3 +30,8 @@ type UserDetailsResponse struct {
 	Message string `json:"message"`
 	Email   string `json:"email"`
 }
+
+type IndexResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
