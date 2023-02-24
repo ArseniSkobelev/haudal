@@ -86,7 +86,7 @@ func GetUser(c *fiber.Ctx) error {
 	claims := jwt.MapClaims{}
 
 	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(env.GetEnvValue("SECRET_KEY", env.PRODUCTION)), nil
+		return []byte(env.GetEnvValue("SECRET_KEY", env.DEV)), nil
 	})
 
 	if err != nil {
