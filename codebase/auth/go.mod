@@ -10,7 +10,6 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-jwt/jwt/v4 v4.4.3
 	github.com/google/uuid v1.3.0
-	github.com/joho/godotenv v1.5.1
 	go.mongodb.org/mongo-driver v1.11.2
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 )
