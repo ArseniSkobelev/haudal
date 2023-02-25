@@ -27,9 +27,9 @@ type LoginData struct {
 }
 
 type APIKey struct {
-	AccessToken string `bson:"access_token" json:"access_token"`
-	UserID      string `bson:"user_id" json:"user_id"`
-	AppName     string `bson:"app_name" json:"app_name"`
+	AccessToken string             `bson:"access_token" json:"access_token"`
+	UserID      primitive.ObjectID `bson:"user_id" json:"user_id"`
+	AppName     string             `bson:"app_name" json:"app_name"`
 }
 
 type RequestData struct {
@@ -47,6 +47,10 @@ type Id struct {
 
 type ApplicationData struct {
 	AppName string `bson:"app_name" json:"app_name"`
+}
+
+type RetrievedKeys struct {
+	Keys []APIKey `bson:"api_keys" json:"api_keys"`
 }
 
 func (u *User) Serialize() {
@@ -67,4 +71,9 @@ func (ad *ApplicationData) Serialize() {
 	if ad.AppName == "" {
 		ad.AppName = "Application"
 	}
+}
+
+func (rk *RetrievedKeys) AddItem(item APIKey) []APIKey {
+	rk.Keys = append(rk.Keys, item)
+	return rk.Keys
 }

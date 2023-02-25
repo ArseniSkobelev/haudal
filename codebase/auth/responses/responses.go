@@ -41,3 +41,9 @@ type ErrorResponse struct {
 	Message      string `json:"message"`
 	IsAuthorized bool   `json:"is_authorized"`
 }
+
+type APIKeysResponse struct {
+	Status  int             `json:"status"`
+	Message string          `json:"message"`
+	Keys    []models.APIKey `json:"api_keys"`
+}

@@ -6,13 +6,11 @@ import (
 	"time"
 
 	"github.com/ArseniSkobelev/haudal/internal/db"
-	"github.com/ArseniSkobelev/haudal/internal/env"
 	"github.com/ArseniSkobelev/haudal/internal/helpers"
 	token "github.com/ArseniSkobelev/haudal/internal/token"
 	"github.com/ArseniSkobelev/haudal/models"
 	"github.com/ArseniSkobelev/haudal/responses"
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -23,7 +21,6 @@ var usersCollection *mongo.Collection = db.GetCollection(db.DB, "users")
 
 func CreateToken(c *fiber.Ctx) error {
 	var t models.APIKey
-	var u models.User
 	var ad models.ApplicationData
 
 	ad.Serialize()
@@ -36,38 +33,23 @@ func CreateToken(c *fiber.Ctx) error {
 
 	authHeader := c.Get("Authorization")
 
-	if authHeader == "" {
-		return c.Status(fiber.StatusInternalServerError).JSON(responses.AuthorizationResponse{Status: fiber.StatusInternalServerError, Message: "JWT Token invalid", IsAuthorized: false, Data: ""})
+	uid, userType, verifyUser := helpers.VerifyUserToken(ctx, authHeader)
+
+	if verifyUser != true {
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: "Invalid JWT token or invalid user signature", IsAuthorized: false})
 	}
 
-	authToken := authHeader[7:]
-
-	claims := jwt.MapClaims{}
-
-	_, err := jwt.ParseWithClaims(authToken, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(env.GetEnvValue("SECRET_KEY", env.DEV)), nil
-	})
-
-	uid := helpers.GetUserIdByEmail(ctx, claims["user_email"].(string), claims["user_type"].(string))
+	if userType != "admin" {
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "User is not an application admin", IsAuthorized: false, Data: ""})
+	}
 
 	objectId, err := primitive.ObjectIDFromHex(uid)
 	if err != nil {
 		log.Println(err.Error())
-		return c.Status(fiber.StatusInternalServerError).JSON(responses.AuthorizationResponse{Status: fiber.StatusInternalServerError, Message: "User not found", IsAuthorized: false, Data: ""})
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: "Unable to retrieve userid", IsAuthorized: false})
 	}
 
-	err = usersCollection.FindOne(ctx, bson.M{"_id": objectId}).Decode(&u)
-
-	if err != nil {
-		log.Println(err.Error())
-		return c.Status(fiber.StatusInternalServerError).JSON(responses.AuthorizationResponse{Status: fiber.StatusInternalServerError, Message: "User not found", IsAuthorized: false, Data: ""})
-	}
-
-	if u.UserType.String() != "admin" {
-		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "User is not an application admin", IsAuthorized: false, Data: ""})
-	}
-
-	apiKey, err := helpers.GenerateAPIKey(uid, ad.AppName)
+	apiKey, err := helpers.GenerateAPIKey(objectId, ad.AppName)
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(responses.AuthorizationResponse{Status: fiber.StatusInternalServerError, Message: "API token creation failed", IsAuthorized: false, Data: ""})
@@ -92,4 +74,43 @@ func VerifyKey(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(data)
+}
+
+func GetTokens(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	var retrievedKeys []models.APIKey
+
+	authHeader := c.Get("Authorization")
+
+	uid, userType, verifyUser := helpers.VerifyUserToken(ctx, authHeader)
+
+	if verifyUser != true {
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: "Invalid JWT token or invalid user signature", IsAuthorized: false})
+	}
+
+	if userType != "admin" {
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "User is not an application admin", IsAuthorized: false, Data: ""})
+	}
+
+	objectId, err := primitive.ObjectIDFromHex(uid)
+	if err != nil {
+		log.Println(err.Error())
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: "Unable to retrieve userid", IsAuthorized: false})
+	}
+
+	result, err := apikeyCollection.Find(ctx, bson.M{"user_id": objectId})
+
+	if err != nil {
+		log.Println(err.Error())
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: "Unable to retrieve userid", IsAuthorized: false})
+	}
+
+	if err = result.All(ctx, &retrievedKeys); err != nil {
+		log.Fatal(err)
+	}
+
+	retrievedTokens := retrievedKeys
+
+	return c.Status(fiber.StatusOK).JSON(responses.APIKeysResponse{Status: fiber.StatusOK, Message: "OK", Keys: retrievedTokens})
 }
