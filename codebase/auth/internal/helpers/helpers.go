@@ -13,6 +13,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -56,7 +57,7 @@ func CreateJwtToken(email string, user_type string) string {
 	return tokenString
 }
 
-func GenerateAPIKey(uid string, appName string) (interface{}, error) {
+func GenerateAPIKey(uid primitive.ObjectID, appName string) (interface{}, error) {
 
 	return models.APIKey{
 		AccessToken: uuid.New().String(),
@@ -89,4 +90,41 @@ func GetUserIdByEmail(ctx context.Context, email string, user_type string) strin
 	}
 
 	return id.Id
+}
+
+func VerifyUserToken(ctx context.Context, authHeader string) (string, string, bool) {
+	var u models.User
+
+	token := authHeader[7:]
+
+	if token == "" {
+		return "", "", false
+	}
+
+	claims := jwt.MapClaims{}
+
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(env.GetEnvValue("SECRET_KEY", env.DEV)), nil
+	})
+
+	if err != nil {
+		return "", "", false
+	}
+
+	uid := GetUserIdByEmail(ctx, claims["user_email"].(string), claims["user_type"].(string))
+
+	objectId, err := primitive.ObjectIDFromHex(uid)
+	if err != nil {
+		log.Println(err.Error())
+		return "", "", false
+	}
+
+	err = userCollection.FindOne(ctx, bson.M{"_id": objectId}).Decode(&u)
+
+	if err != nil {
+		log.Println(err.Error())
+		return "", "", false
+	}
+
+	return uid, u.UserType.String(), true
 }

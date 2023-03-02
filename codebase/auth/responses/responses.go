@@ -30,3 +30,20 @@ type UserDetailsResponse struct {
 	Message string `json:"message"`
 	Email   string `json:"email"`
 }
+
+type IndexResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+type ErrorResponse struct {
+	Status       int    `json:"status"`
+	Message      string `json:"message"`
+	IsAuthorized bool   `json:"is_authorized"`
+}
+
+type APIKeysResponse struct {
+	Status  int             `json:"status"`
+	Message string          `json:"message"`
+	Keys    []models.APIKey `json:"api_keys"`
+}

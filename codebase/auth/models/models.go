@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type UserType string
@@ -12,10 +14,10 @@ const (
 )
 
 type User struct {
-	Email        string    `bson:"email" json:"email,omitempty" validate:"required"`
-	PasswordHash string    `bson:"password_hash" json:"password_hash" validate:"required"`
-	CreatedAt    time.Time `bson:"created_at" json:"created_at" bson:"created_at"`
-	UserType     UserType  `bson:"user_type" json:"user_type"`
+	Email        string             `bson:"email" json:"email,omitempty" validate:"required"`
+	PasswordHash string             `bson:"password_hash" json:"password_hash" validate:"required"`
+	CreatedAt    primitive.DateTime `bson:"created_at" json:"created_at" bson:"created_at"`
+	UserType     UserType           `bson:"user_type" json:"user_type"`
 }
 
 type LoginData struct {
@@ -25,9 +27,9 @@ type LoginData struct {
 }
 
 type APIKey struct {
-	AccessToken string `bson:"access_token" json:"access_token"`
-	UserID      string `bson:"user_id" json:"user_id"`
-	AppName     string `bson:"app_name" json:"app_name"`
+	AccessToken string             `bson:"access_token" json:"access_token"`
+	UserID      primitive.ObjectID `bson:"user_id" json:"user_id"`
+	AppName     string             `bson:"app_name" json:"app_name"`
 }
 
 type RequestData struct {
@@ -47,14 +49,12 @@ type ApplicationData struct {
 	AppName string `bson:"app_name" json:"app_name"`
 }
 
-func (u *User) Serialize() {
-	if u.CreatedAt.IsZero() {
-		u.CreatedAt = time.Now()
-	}
+type RetrievedKeys struct {
+	Keys []APIKey `bson:"api_keys" json:"api_keys"`
+}
 
-	if u.UserType == "" {
-		u.UserType = DEFAULT
-	}
+func (u *User) Serialize() {
+	u.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 }
 
 func (ut UserType) String() string {
@@ -71,4 +71,9 @@ func (ad *ApplicationData) Serialize() {
 	if ad.AppName == "" {
 		ad.AppName = "Application"
 	}
+}
+
+func (rk *RetrievedKeys) AddItem(item APIKey) []APIKey {
+	rk.Keys = append(rk.Keys, item)
+	return rk.Keys
 }

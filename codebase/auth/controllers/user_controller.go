@@ -41,22 +41,20 @@ func CreateUser(c *fiber.Ctx) error {
 		UserType:     u.UserType,
 	}
 
-	nu.Serialize()
+	xHaudalKey := c.Get("X-Haudal-Key")
 
-	if nu.UserType == "default" {
-		apiKeyHeader := c.Get("X-Haudal-Key")
-
-		if len(apiKeyHeader) == 0 {
-			return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "Invalid API key provided", IsAuthorized: false, Data: ""})
-		}
-
+	if len(xHaudalKey) == 0 {
+		nu.UserType = models.UserType(models.ADMIN.String())
+	} else {
 		var apiKey models.APIKey
 
-		err := apikeysCollection.FindOne(ctx, bson.M{"access_token": apiKeyHeader}).Decode(&apiKey)
+		err := apikeysCollection.FindOne(ctx, bson.M{"access_token": xHaudalKey}).Decode(&apiKey)
 
 		if err != nil {
-			return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "Invalid API key provided", IsAuthorized: false, Data: ""})
+			return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: "X-Haudal-Key HTTP header is missing or is malformed", IsAuthorized: false})
 		}
+
+		nu.UserType = models.UserType(models.DEFAULT.String())
 	}
 
 	err := userCollection.FindOne(ctx, bson.M{"$and": []bson.M{
@@ -65,7 +63,7 @@ func CreateUser(c *fiber.Ctx) error {
 	}}).Decode(&u)
 
 	if err == nil {
-		return c.Status(fiber.StatusConflict).JSON(responses.UserResponse{Status: fiber.StatusConflict, Message: "User with the given email already exists", Data: &fiber.Map{"data": ""}})
+		return c.Status(fiber.StatusConflict).JSON(responses.ErrorResponse{Status: fiber.StatusConflict, Message: "User with the given email already exists"})
 	}
 
 	_, err = userCollection.InsertOne(ctx, nu)

@@ -5,3 +5,4 @@
 **/.vs
 **/dist
 **/docker-compose-dev.yaml
+**/dev_data

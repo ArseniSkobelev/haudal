@@ -13,6 +13,7 @@ func APIKeyRoute(app *fiber.App) {
 	}))
 
 	app.Post("api/v1/token/create", controllers.CreateToken)
+	app.Get("api/v1/token", controllers.GetTokens)
 	// app.Post("api/v1/token/verify", controllers.VerifyKey)
 	// app.Post("api/v1/token/refresh", controllers.RefreshToken)
 }
