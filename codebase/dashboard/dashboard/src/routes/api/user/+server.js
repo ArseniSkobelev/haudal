@@ -24,6 +24,10 @@ export const POST = async ({ request }) => {
                 message: "User created successfully. You are currently being redirected to the homepage",
                 token: responseData.token
             }))
+        } else {
+            return new Response(JSON.stringify({
+                responseData
+            }))
         }
     }
 }

@@ -22,3 +22,16 @@ export const POST = async ({ request }) => {
         key: api_response.key
     }))
 }
+
+export const GET = async ({ request }) => {
+    const result = await fetch(`${BASE_URL}/token`, {
+        method: "GET",
+        headers: {
+            "Authorization": request.headers.get("authorization")
+        }
+    })
+
+    let apiKeys = await result.json()
+
+    return new Response(JSON.stringify(apiKeys))
+}
