@@ -11,22 +11,21 @@ export const actions: Actions = {
             return fail(422, { error: "Username or password is missing" })
         }
 
-        const response = await fetch(`${SECRET_BASE_URL}/user`, {
+        const response = await fetch(`${SECRET_BASE_URL}/session/create`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 "email": formData.email,
-                "password_hash": formData.password
+                "password": formData.password
             })
         })
 
         const jsonResponse = await response.json();
 
-
         if (jsonResponse.is_authorized) {
-            throw redirect(302, "/login")
+            throw redirect(302, "/")
         } else {
             return fail(jsonResponse.status, { error: jsonResponse.message })
         }
