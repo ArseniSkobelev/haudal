@@ -25,6 +25,13 @@ export const actions: Actions = {
         const jsonResponse = await response.json();
 
         if (jsonResponse.is_authorized) {
+            event.cookies.set('Authorization', `Bearer ${jsonResponse.token}`, {
+                httpOnly: true,
+                path: '/',
+                secure: true,
+                sameSite: 'strict',
+                maxAge: 60 * 60 * 24
+            })
             throw redirect(302, "/")
         } else {
             return fail(jsonResponse.status, { error: jsonResponse.message })
