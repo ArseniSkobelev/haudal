@@ -28,11 +28,11 @@ func CreateUser(c *fiber.Ctx) error {
 	defer cancel()
 
 	if err := c.BodyParser(&u); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(responses.UserResponse{Status: fiber.StatusBadRequest, Message: "error", Data: &fiber.Map{"data": err.Error()}})
+		return c.Status(fiber.StatusBadRequest).JSON(responses.ErrorResponse{Status: fiber.StatusBadRequest, Message: "Not enough data has been provided in the POST request."})
 	}
 
 	if validationErr := validate.Struct(&u); validationErr != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(responses.UserResponse{Status: fiber.StatusBadRequest, Message: "error", Data: &fiber.Map{"data": validationErr.Error()}})
+		return c.Status(fiber.StatusBadRequest).JSON(responses.ErrorResponse{Status: fiber.StatusBadRequest, Message: "Invalid data provided in the POST request."})
 	}
 
 	nu := models.User{
@@ -51,7 +51,7 @@ func CreateUser(c *fiber.Ctx) error {
 		err := apikeysCollection.FindOne(ctx, bson.M{"access_token": xHaudalKey}).Decode(&apiKey)
 
 		if err != nil {
-			return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: "X-Haudal-Key HTTP header is missing or is malformed", IsAuthorized: false})
+			return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: "X-Haudal-Key HTTP header is missing or is malformed.", IsAuthorized: false})
 		}
 
 		nu.UserType = models.UserType(models.DEFAULT.String())
@@ -63,17 +63,17 @@ func CreateUser(c *fiber.Ctx) error {
 	}}).Decode(&u)
 
 	if err == nil {
-		return c.Status(fiber.StatusConflict).JSON(responses.ErrorResponse{Status: fiber.StatusConflict, Message: "User with the given email already exists"})
+		return c.Status(fiber.StatusConflict).JSON(responses.ErrorResponse{Status: fiber.StatusConflict, Message: "User with the given email already exists."})
 	}
 
 	_, err = userCollection.InsertOne(ctx, nu)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(responses.UserResponse{Status: fiber.StatusBadRequest, Message: "Unable to create user", Data: &fiber.Map{"data": ""}})
+		return c.Status(fiber.StatusBadRequest).JSON(responses.UserResponse{Status: fiber.StatusBadRequest, Message: "Unable to create user.", Data: &fiber.Map{"data": ""}})
 	}
 
 	token := helpers.CreateJwtToken(nu.Email, string(nu.UserType))
 
-	return c.Status(fiber.StatusCreated).JSON(responses.AuthorizationResponse{Status: fiber.StatusCreated, Message: "Created", IsAuthorized: true, Data: token})
+	return c.Status(fiber.StatusCreated).JSON(responses.AuthorizationResponse{Status: fiber.StatusCreated, Message: "User created successfully.", IsAuthorized: true, Data: token})
 }
 
 func GetUser(c *fiber.Ctx) error {
@@ -90,7 +90,7 @@ func GetUser(c *fiber.Ctx) error {
 	})
 
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "Unable to gather session data", Data: token, IsAuthorized: false})
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "Unable to gather session data.", Data: token, IsAuthorized: false})
 	}
 
 	var userType string
@@ -108,13 +108,13 @@ func GetUser(c *fiber.Ctx) error {
 	objId, err := primitive.ObjectIDFromHex(userId)
 
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "Authorization failed", Data: token, IsAuthorized: false})
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "Unable to find a user with the provided data.", Data: token, IsAuthorized: false})
 	}
 
 	err = userCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&u)
 
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "Authorization failed", Data: token, IsAuthorized: false})
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "Unable to find a user with the provided data.", Data: token, IsAuthorized: false})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(responses.UserDetailsResponse{Status: fiber.StatusOK, Message: "OK", Email: u.Email})

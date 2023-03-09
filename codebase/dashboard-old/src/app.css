@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    font-family: "Inter"
+}
+
+body {
+    background-color: #F4F3EF;
+    height: 100vh;
+}
+
+.desktop-title {
+    font-size: 32px;
+}
+
+.desktop-secondary-title {
+    font-size: 24px;
+}
+
+.desktop-body-text {
+    font-size: 16px;
+}
+
+.mobile-body-text {
+    font-size: 14px;
+}
+
+.mobile-title {
+    font-size: 24px;
+}
+
+.mobile-secondary-title {
+    font-size: 20px;
+}
