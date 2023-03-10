@@ -1,7 +1,7 @@
 <script lang="ts">
     let showMobileMenu = false;
 
-    import MenuState from "../stores/MenuStore";
+    import MenuState from "../lib/stores/MenuStore";
 
     MenuState.subscribe((data) => {
         showMobileMenu = data;
