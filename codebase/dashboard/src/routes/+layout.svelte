@@ -41,7 +41,7 @@
     };
 </script>
 
-{#if $page.url.pathname === "/login" || $page.url.pathname === "/register"}
+{#if $page.url.pathname === "/login" || $page.url.pathname === "/register" || $page.url.pathname === "/applications/create"}
     <slot><!-- optional fallback --></slot>
 {:else}
     <main class="flex flex-row h-full">
@@ -49,8 +49,10 @@
             <div
                 class="flex flex-col w-full h-full gap-4 bg-nav_bar_color text-subtle_element_color"
             >
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <div
-                    class="flex flex-row items-center justify-center gap-4 p-4 text-white xl:p-8"
+                    class="flex flex-row items-center justify-center gap-4 p-4 cursor-pointer text-white xl:p-8 cur"
+                    on:click={() => goto("/")}
                 >
                     <img
                         src="/images/haudal-logo.svg"

@@ -14,7 +14,8 @@ module.exports = {
         alert_danger: "#E81919"
       },
       backgroundImage: {
-        'login_image': "url('/images/login-image.jpg')"
+        'login_image': "url('/images/login-image.jpg')",
+        "signup_image": "url('/images/signup_image.jpg')"
       }
     },
   },

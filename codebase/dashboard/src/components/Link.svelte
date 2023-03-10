@@ -4,7 +4,7 @@
     export let icon: string = "/images/home.svg";
     export let title: string = "Navigation";
 
-    import MenuState from "../stores/MenuStore";
+    import MenuState from "../lib/stores/MenuStore";
 
     $: active = $page.url.pathname === href;
 </script>

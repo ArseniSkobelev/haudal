@@ -6,11 +6,8 @@
                 "Authentication",
                 "Security"
             ],
-            "port": 3000,
+            "port": 19000,
             "description": "The authentication service."
         }
-    ],
-    "commands": {
-        "FixStorybookError": "export NODE_OPTIONS=--openssl-legacy-provider"
-    }
+    ]
 }
