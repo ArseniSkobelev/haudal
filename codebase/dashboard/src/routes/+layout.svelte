@@ -1,12 +1,13 @@
 <script lang="ts">
-    import "../app.css";
-    import { page } from "$app/stores";
-
     let showMobileMenu = false;
 
-    const handleMenu = () => {
-        showMobileMenu = !showMobileMenu;
-    };
+    import MenuState from "../stores/MenuStore";
+
+    MenuState.subscribe((data) => {
+        showMobileMenu = data;
+    });
+    import "../app.css";
+    import { page } from "$app/stores";
 
     const navItems = [
         {
@@ -23,15 +24,21 @@
         },
     ];
 
-    const load: Load = () => {
-        console.log("test");
+    const handleLogout = () => {
+        $MenuState = false;
+        goto("/logout");
     };
 
     import Link from "../components/Link.svelte";
     import Title from "../components/Title.svelte";
     import Button from "../components/Button.svelte";
     import { goto } from "$app/navigation";
-    import type { Load } from "@sveltejs/kit";
+
+    const handleMenu = () => {
+        MenuState.update((data) => {
+            return !showMobileMenu;
+        });
+    };
 </script>
 
 {#if $page.url.pathname === "/login" || $page.url.pathname === "/register"}
@@ -47,13 +54,12 @@
                 >
                     <img
                         src="/images/haudal-logo.svg"
-                        width="32px"
-                        height="32px"
+                        class="w-8 h-8 2xl:w-12 2xl:h-12"
                         alt="LOGO"
                     />
                     <h1 class="title">Haudal</h1>
                 </div>
-                <div class="flex flex-col p-4">
+                <div class="flex flex-col p-4 xl:px-10 gap-4">
                     {#each navItems as link}
                         <Link
                             title={link.title}
@@ -62,8 +68,8 @@
                         />
                     {/each}
                 </div>
-                <div class="flex flex-col p-4 mt-auto">
-                    <Button onClick={() => goto("/logout")} isPrimary={true}
+                <div class="flex flex-col p-8 mt-auto">
+                    <Button onClick={() => handleLogout()} isPrimary={true}
                         >Logout</Button
                     >
                 </div>
@@ -91,9 +97,9 @@
 
             <div class="h-[1px] bg-subtle_element_color" />
 
-            {#if showMobileMenu == true}
-                <div class="bg-nav_bar_color">
-                    <ul class="flex flex-col">
+            {#if showMobileMenu}
+                <div class="bg-nav_bar_color px-8 pt-8">
+                    <ul class="flex flex-col mb-8">
                         {#each navItems as link}
                             <Link
                                 title={link.title}
@@ -101,11 +107,12 @@
                                 icon={link.icon}
                             />
                         {/each}
-                        <ul />
-                        <Button onClick={() => goto("/logout")} isPrimary={true}
-                            >Logout</Button
-                        >
                     </ul>
+                    <Button
+                        classList={"w-full mb-8"}
+                        onClick={() => handleLogout()}
+                        isPrimary={true}>Logout</Button
+                    >
                 </div>
             {/if}
             <div>
