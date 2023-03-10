@@ -1,10 +1,21 @@
 <script lang="ts">
     import Input from "../../components/Input.svelte";
     import Button from "../../components/Button.svelte";
+    import Error from "../../components/Error.svelte";
     import { enhance } from "$app/forms";
+
+    $: showError = false;
 
     import type { ActionData } from "./$types";
     export let form: ActionData;
+
+    const toggleError = async () => {
+        showError = !showError;
+    };
+
+    function sleep(ms: number) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
 </script>
 
 <main class="flex flex-row w-full h-full p-8">
@@ -14,6 +25,11 @@
         <form method="POST" use:enhance>
             <div class="flex flex-col gap-8">
                 <div class="flex flex-col gap-8">
+                    {#if showError}
+                        {#if form?.error}
+                            <Error message={form.error} onClick={toggleError} />
+                        {/if}
+                    {/if}
                     <Input
                         title="Email"
                         placeholder="john.doe@gmail.com"
@@ -28,14 +44,11 @@
                     />
                 </div>
                 <div class="flex flex-col">
-                    <Button isPrimary={true}>Create account</Button>
+                    <Button isPrimary={true} onClick={toggleError}
+                        >Create account</Button
+                    >
                 </div>
             </div>
-            {#if form?.error}
-                <div class="notice error">
-                    {form.error}
-                </div>
-            {/if}
         </form>
         <div class="flex flex-row items-center w-full gap-2">
             <div class="h-[1px] w-full bg-subtle_element_color" />

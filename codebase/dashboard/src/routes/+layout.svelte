@@ -23,13 +23,15 @@
         },
     ];
 
-    const handleLogout = () => {
-        console.log("Logged out");
+    const load: Load = () => {
+        console.log("test");
     };
 
     import Link from "../components/Link.svelte";
     import Title from "../components/Title.svelte";
     import Button from "../components/Button.svelte";
+    import { goto } from "$app/navigation";
+    import type { Load } from "@sveltejs/kit";
 </script>
 
 {#if $page.url.pathname === "/login" || $page.url.pathname === "/register"}
@@ -61,7 +63,7 @@
                     {/each}
                 </div>
                 <div class="flex flex-col p-4 mt-auto">
-                    <Button onClick={handleLogout} isPrimary={true}
+                    <Button onClick={() => goto("/logout")} isPrimary={true}
                         >Logout</Button
                     >
                 </div>
@@ -82,6 +84,7 @@
                             : "/images/menu.svg"}
                         alt="Menu"
                         on:click={handleMenu}
+                        class="cursor-pointer"
                     />
                 </div>
             </div>
@@ -99,7 +102,7 @@
                             />
                         {/each}
                         <ul />
-                        <Button onClick={handleLogout} isPrimary={true}
+                        <Button onClick={() => goto("/logout")} isPrimary={true}
                             >Logout</Button
                         >
                     </ul>
