@@ -14,7 +14,7 @@ module.exports = {
         alert_danger: "#E81919"
       },
       backgroundImage: {
-        'login_screen': "url('https://images.pexels.com/photos/2909077/pexels-photo-2909077.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')"
+        'login_image': "url('/images/login-image.jpg')"
       }
     },
   },
