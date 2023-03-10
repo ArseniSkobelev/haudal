@@ -23,10 +23,15 @@
         },
     ];
 
+    const load: Load = () => {
+        console.log("test");
+    };
+
     import Link from "../components/Link.svelte";
     import Title from "../components/Title.svelte";
     import Button from "../components/Button.svelte";
     import { goto } from "$app/navigation";
+    import type { Load } from "@sveltejs/kit";
 </script>
 
 {#if $page.url.pathname === "/login" || $page.url.pathname === "/register"}
@@ -79,6 +84,7 @@
                             : "/images/menu.svg"}
                         alt="Menu"
                         on:click={handleMenu}
+                        class="cursor-pointer"
                     />
                 </div>
             </div>

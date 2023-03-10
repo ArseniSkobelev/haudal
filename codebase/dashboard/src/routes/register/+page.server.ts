@@ -1,6 +1,10 @@
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { SECRET_BASE_URL } from '$env/static/private';
+
+export const load: PageServerLoad = async (events) => {
+    if (events.locals.user) throw redirect(302, "/")
+}
 
 export const actions: Actions = {
     default: async (event) => {
