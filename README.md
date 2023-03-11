@@ -1,7 +1,7 @@
 <a name="readme-top"></a>
 
 <!-- Social links go here -->
-<div style="display: flex; flex-direction: row; justify-content: center;">
+<div align="center">
     <a href="https://www.linkedin.com/in/arseni-skobelev/">
         <img src="https://img.shields.io/badge/linkedin-%230077B5.svg?&style=for-the-badge&logo=linkedin&logoColor=white" />
     </a>
@@ -19,11 +19,11 @@
     </span>
     <br />
     <br />
-    <a href="https://github.com/github_username/repo_name">View Demo</a>
+    <a href="https://github.com/github_username/repo_name">COMMING SOON</a>
     ·
-    <a href="https://github.com/github_username/repo_name/issues">Report Bug</a>
+    <a href="https://github.com/github_username/repo_name/issues">COMMING SOON</a>
     ·
-    <a href="https://github.com/github_username/repo_name/issues">Request Feature</a>
+    <a href="https://github.com/github_username/repo_name/issues">COMMING SOON</a>
 </div>
 
 <br />
@@ -42,17 +42,17 @@
       </ul>
     </li>
     <li>
-      <a href="#getting-started">Getting Started</a>
+      <a href="#getting-started">COMMING SOON</a>
       <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
+        <li><a href="#prerequisites">COMMING SOON</a></li>
+        <li><a href="#installation">COMMING SOON</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
+    <li><a href="#usage">COMMING SOON</a></li>
+    <li><a href="#roadmap">COMMING SOON</a></li>
+    <li><a href="#contributing">COMMING SOON</a></li>
+    <li><a href="#license">COMMING SOON</a></li>
+    <li><a href="#contact">COMMING SOON</a></li>
   </ol>
 </details>
 <br />
