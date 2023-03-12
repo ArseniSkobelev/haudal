@@ -15,7 +15,7 @@ export const actions: Actions = {
             return fail(422, { error: "Username or password is missing" })
         }
 
-        const response = await fetch(`${SECRET_BASE_URL}/session/create`, {
+        const response = await fetch(`${SECRET_BASE_URL}/session`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
