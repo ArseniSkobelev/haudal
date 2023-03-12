@@ -45,3 +45,32 @@ export const DELETE: RequestHandler = async ({ request, cookies }: RequestEvent)
         "is_deleted": false
     }))
 }
+
+export const POST: RequestHandler = async ({ request, cookies }: RequestEvent) => {
+    const requestData = await request.json();
+
+    if (requestData.app_name) {
+        let authHeader = cookies.get("Authorization");
+
+        if (authHeader) {
+            let apiResponse = await fetch(`${SECRET_BASE_URL}/token`, {
+                method: "POST",
+                headers: {
+                    "Authorization": authHeader,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "app_name": requestData.app_name
+                })
+            })
+
+            const apiResponseJson = await apiResponse.json();
+
+            return new Response(JSON.stringify(apiResponseJson));
+        }
+    }
+
+    return new Response(JSON.stringify({
+        "status": 500,
+    }))
+}
