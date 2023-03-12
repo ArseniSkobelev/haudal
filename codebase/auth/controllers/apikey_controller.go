@@ -114,3 +114,51 @@ func GetTokens(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(responses.APIKeysResponse{Status: fiber.StatusOK, Message: "OK", Keys: retrievedTokens})
 }
+
+func DeleteToken(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	var at models.RequestData
+
+	authHeader := c.Get("Authorization")
+
+	uid, userType, verifyUser := helpers.VerifyUserToken(ctx, authHeader)
+
+	if verifyUser != true {
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: "Invalid JWT token or invalid user signature", IsAuthorized: false})
+	}
+
+	if userType != "admin" {
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "User is not an application admin", IsAuthorized: false, Data: ""})
+	}
+
+	if err := c.BodyParser(&at); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(responses.ErrorResponse{Status: fiber.StatusBadRequest, Message: "Not enough data has been provided in the POST request."})
+	}
+
+	if validationErr := validate.Struct(&at); validationErr != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(responses.ErrorResponse{Status: fiber.StatusBadRequest, Message: "Invalid data provided in the POST request."})
+	}
+
+	objectId, err := primitive.ObjectIDFromHex(uid)
+	if err != nil {
+		log.Println(err.Error())
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: "Unable to retrieve userid", IsAuthorized: false})
+	}
+
+	deletedDocument, err := apikeyCollection.DeleteOne(ctx, bson.M{"$and": []bson.M{
+		{"user_id": objectId},
+		{"access_token": at.AccessToken},
+	}})
+
+	if deletedDocument.DeletedCount == 0 {
+		return c.Status(fiber.StatusNotModified).JSON(responses.DeletedResponse{Status: fiber.StatusNotModified, IsDeleted: false})
+	}
+
+	if err != nil {
+		log.Println(err.Error())
+		return c.Status(fiber.StatusNotModified).JSON(responses.DeletedResponse{Status: fiber.StatusNotModified, IsDeleted: false})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(responses.DeletedResponse{Status: fiber.StatusOK, IsDeleted: true})
+}

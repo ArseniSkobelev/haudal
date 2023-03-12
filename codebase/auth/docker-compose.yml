@@ -8,7 +8,7 @@ services:
       - "19000:19000" # !! has to match the API_PORT env
     command: go run cmd/app/main.go -b 0.0.0.0
     environment:
-      SECRET_KEY: <secret_key>
+      SECRET_KEY: dev
       MONGO_URI: "mongodb://haudal-auth-db:27017/haudal-auth?authSource=admin" # should not be changed if used with provided database
       API_PORT: 19000
     depends_on:
@@ -20,7 +20,7 @@ services:
     ports:
       - "30001:27017" # optional; used for debugging of db entries
     volumes:
-      - <mongodb_data_path>:/data/db
+      - ~/Code/haudal/codebase/auth/dev_data:/data/db
     environment:
       MONGODB_INITDB_ROOT_USERNAME: <root_username>
       MONGODB_INITDB_ROOT_PASSWORD: <root_password>

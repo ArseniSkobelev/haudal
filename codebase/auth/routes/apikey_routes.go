@@ -12,8 +12,9 @@ func APIKeyRoute(app *fiber.App) {
 		SigningKey: []byte(env.GetEnvValue("SECRET_KEY", env.DEV)),
 	}))
 
-	app.Post("api/v1/token/create", controllers.CreateToken)
+	app.Post("api/v1/token", controllers.CreateToken)
 	app.Get("api/v1/token", controllers.GetTokens)
+	app.Delete("api/v1/token", controllers.DeleteToken)
 	// app.Post("api/v1/token/verify", controllers.VerifyKey)
 	// app.Post("api/v1/token/refresh", controllers.RefreshToken)
 }

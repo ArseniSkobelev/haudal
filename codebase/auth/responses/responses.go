@@ -47,3 +47,8 @@ type APIKeysResponse struct {
 	Message string          `json:"message"`
 	Keys    []models.APIKey `json:"api_keys"`
 }
+
+type DeletedResponse struct {
+	Status    int  `json:"status"`
+	IsDeleted bool `json:"is_deleted"`
+}
