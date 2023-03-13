@@ -26,9 +26,9 @@
 <main class="flex flex-col gap-8">
     <div class="flex flex-row justify-between">
         <h1 class="title-two">Your applications</h1>
-        <div class="hidden xl:block">
+        <div class="">
             <Button
-                classList={"w-full"}
+                classList={"w-full text-sm px-2 lg:text-lg lg:px-8"}
                 onClick={() => goto("/applications/create")}
                 >Create application</Button
             >
@@ -37,39 +37,41 @@
     <div
         class="flex flex-col gap-6 items-center overflow-y-auto lg:max-h-[500px]"
     >
-        {#each data.api_keys as application}
-            <div class="flex flex-col gap-4 bg-white p-4 rounded w-full">
-                <div class="text-xl flex flex-row justify-between items-center">
-                    <div>
-                        <h2 class="font-medium">
-                            {application.app_name}
-                        </h2>
+        {#if data.api_keys.lenght > 0}
+            {#each data.api_keys as application}
+                <div class="flex flex-col gap-4 bg-white p-4 rounded w-full">
+                    <div
+                        class="text-xl flex flex-row justify-between items-center"
+                    >
+                        <div>
+                            <h2 class="font-medium">
+                                {application.app_name}
+                            </h2>
+                        </div>
+                        <div>
+                            <!-- svelte-ignore a11y-click-events-have-key-events -->
+                            <img
+                                class="cursor-pointer"
+                                src="/images/trash.svg"
+                                on:click={() =>
+                                    deleteApp(application.access_token)}
+                                alt="Delete"
+                            />
+                        </div>
                     </div>
+                    <div class="h-[1px] bg-subtle_element_color" />
                     <div>
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <img
-                            class="cursor-pointer"
-                            src="/images/trash.svg"
-                            on:click={() => deleteApp(application.access_token)}
-                            alt="Delete"
-                        />
+                        <h3 class="text-sm">
+                            {application.access_token}
+                        </h3>
                     </div>
                 </div>
-                <div class="h-[1px] bg-subtle_element_color" />
-                <div>
-                    <h3 class="text-sm">
-                        {application.access_token}
-                    </h3>
-                </div>
+            {/each}
+        {:else}
+            <div class="flex flex-col w-full justify-center items-center mt-4">
+                <h2>You have no applications yet.</h2>
             </div>
-        {/each}
-    </div>
-    <div>
-        <Button
-            classList={"w-full xl:hidden"}
-            onClick={() => goto("/applications/create")}
-            >Create application</Button
-        >
+        {/if}
     </div>
 </main>
 

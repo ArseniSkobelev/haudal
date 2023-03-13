@@ -18,7 +18,12 @@ export const load: PageServerLoad = async ({ locals, cookies, fetch }) => {
 
             const apiResponseJson = await apiResponse.json();
 
-            return { api_keys: apiResponseJson.api_keys, jwt: jwt }
+
+            if (apiResponseJson.api_keys) {
+                return { api_keys: apiResponseJson.api_keys }
+            } else {
+                return { api_keys: [] }
+            }
         }
     }
 }
