@@ -53,6 +53,7 @@
     <li><a href="#contributing">COMMING SOON</a></li>
     <li><a href="#license">COMMING SOON</a></li>
     <li><a href="#contact">COMMING SOON</a></li>
+    <li><a href="#disclaimer">Disclaimer</a></li>
   </ol>
 </details>
 <br />
@@ -99,3 +100,17 @@ The main motivation of this project was to learn and practice the whole developm
 * Learn __Kubernetes__ and host an on-prem cluster running strictly [my own](https://github.com/arseniskobelev) software 
 * Expand my previous knowledge on __Docker__
 * Create a project that would *(in theory)* land me a job as a software developer after my apprenticeship
+
+<br />
+<br />
+
+## Disclaimer
+Use of any widely available APIs/services presented on this page DO gather data (Primarily **geolocation**) about it's use and store them in a way that may or may not be safe or ***"according to the rules".*** At one point the telemetry will be publicly available for others to inspect and/or use in their ways.
+
+<br />
+
+[I, Arseni Skobelev,](https://github.com/ArseniSkobelev) will not take care of any cookie storage acceptions from this point onwards **(13.03.2023).** All of the legal questions will be ignored and redirected back to this exact paragraph.
+
+<br />
+
+> *Ignorance of the law is no excuse in any country. If it were, the laws would lose their effect, because it can always be pretended.* - Thomas Jefferson
