@@ -42,10 +42,12 @@
       </ul>
     </li>
     <li>
-      <a href="#getting-started">COMMING SOON</a>
+      <a href="#services">Services</a>
       <ul>
-        <li><a href="#prerequisites">COMMING SOON</a></li>
-        <li><a href="#installation">COMMING SOON</a></li>
+        <li><a href="#auth">Auth</a></li>
+        <li><a href="#api-key-management">API key management</a></li>
+        <li><a href="#analytics">Analytics</a></li>
+        <li><a href="#logging">Logging</a></li>
       </ul>
     </li>
     <li><a href="#usage">COMMING SOON</a></li>
@@ -76,20 +78,18 @@ This list of technologies used is not meant to be organized in any way shape or 
 <br />
 
 <div align="center">
-    <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 24px; width: 80%;">
-        <img src="https://img.shields.io/badge/SvelteKit-FF3E00?style=for-the-badge&logo=Svelte&logoColor=white" alt="Sveltekit" />
-        <img src="https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Golang" />
-        <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="TailwindCSS" />
-        <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="Typescript" />
-        <img src="https://img.shields.io/badge/Javascript-f7df1e?style=for-the-badge&logo=javascript&logoColor=black" alt="Javascript" />
-        <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3" />
-        <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5" />
-        <img src="https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
-        <img src="https://img.shields.io/badge/kubernetes-326ce5.svg?&style=for-the-badge&logo=kubernetes&logoColor=white" alt="Kubernetes" />
-        <img src="https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white" alt="Ubuntu" />
-        <img src="https://img.shields.io/badge/freebsd-AB2B28?style=for-the-badge&logo=freebsd&logoColor=white" alt="FreeBSD" />
-        <img src="https://img.shields.io/badge/prettier-1A2C34?style=for-the-badge&logo=prettier&logoColor=F7BA3E" alt="Prettier" />
-    </div>
+      <img src="https://img.shields.io/badge/SvelteKit-FF3E00?style=for-the-badge&logo=Svelte&logoColor=white" alt="Sveltekit" />
+      <img src="https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Golang" />
+      <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="TailwindCSS" />
+      <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="Typescript" />
+      <img src="https://img.shields.io/badge/Javascript-f7df1e?style=for-the-badge&logo=javascript&logoColor=black" alt="Javascript" />
+      <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3" />
+      <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5" />
+      <img src="https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+      <img src="https://img.shields.io/badge/kubernetes-326ce5.svg?&style=for-the-badge&logo=kubernetes&logoColor=white" alt="Kubernetes" />
+      <img src="https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white" alt="Ubuntu" />
+      <img src="https://img.shields.io/badge/freebsd-AB2B28?style=for-the-badge&logo=freebsd&logoColor=white" alt="FreeBSD" />
+      <img src="https://img.shields.io/badge/prettier-1A2C34?style=for-the-badge&logo=prettier&logoColor=F7BA3E" alt="Prettier" />
 </div>
 
 <br />
@@ -100,6 +100,39 @@ The main motivation of this project was to learn and practice the whole developm
 * Learn __Kubernetes__ and host an on-prem cluster running strictly [my own](https://github.com/arseniskobelev) software 
 * Expand my previous knowledge on __Docker__
 * Create a project that would *(in theory)* land me a job as a software developer after my apprenticeship
+
+<br />
+<br />
+
+## Services
+This section of the README will present to you a map of all the services and a short explanation of their sole purpose. Please bear in mind that this map is created at a stage where not all of the services are yet implemented.
+
+<br />
+
+<img src="https://cdn.haudal.com/haudal/microservice-architecture.png" alt="Architecture map" width="800px" />
+
+<br />
+
+### Auth
+*To be written...*
+
+<br />
+
+### API key management
+*To be written...*
+
+<br />
+
+### Analytics
+*To be written...*
+
+<br />
+
+### Logging
+*To be written...*
+
+<br />
+
 
 <br />
 <br />
