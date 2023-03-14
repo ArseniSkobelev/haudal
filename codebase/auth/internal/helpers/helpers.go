@@ -63,7 +63,6 @@ func GenerateAPIKey(uid primitive.ObjectID, appName string) (interface{}, error)
 		AccessToken: uuid.New().String(),
 		UserID:      uid,
 		AppName:     appName,
-		// RefreshToken: uuid.New().String(),
 	}, nil
 }
 
@@ -76,8 +75,6 @@ func GetAuthToken(c *fiber.Ctx) string {
 
 func GetUserIdByEmail(ctx context.Context, email string, user_type string) string {
 	var id models.Id
-
-	// err := userCollection.FindOne(ctx, bson.M{"email": email}).Decode(&id)
 
 	err := userCollection.FindOne(ctx, bson.M{"$and": []bson.M{
 		{"email": email},

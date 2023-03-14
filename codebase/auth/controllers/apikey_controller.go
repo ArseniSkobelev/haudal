@@ -7,7 +7,7 @@ import (
 
 	"github.com/ArseniSkobelev/haudal/internal/db"
 	"github.com/ArseniSkobelev/haudal/internal/helpers"
-	token "github.com/ArseniSkobelev/haudal/internal/token"
+	messages "github.com/ArseniSkobelev/haudal/internal/messages"
 	"github.com/ArseniSkobelev/haudal/models"
 	"github.com/ArseniSkobelev/haudal/responses"
 	"github.com/gofiber/fiber/v2"
@@ -16,9 +16,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var apikeyCollection *mongo.Collection = db.GetCollection(db.DB, "api_keys")
-var usersCollection *mongo.Collection = db.GetCollection(db.DB, "users")
+var apiKeyCollection *mongo.Collection = db.GetCollection(db.DB, "api_keys")
 
+// ------------------------------------------------------- //
+// Create API key and return it					           //
+// ------------------------------------------------------- //
 func CreateToken(c *fiber.Ctx) error {
 	var t models.APIKey
 	var ad models.ApplicationData
@@ -57,7 +59,7 @@ func CreateToken(c *fiber.Ctx) error {
 
 	t = apiKey.(models.APIKey)
 
-	_, err = apikeyCollection.InsertOne(ctx, t)
+	_, err = apiKeyCollection.InsertOne(ctx, t)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(responses.AuthorizationResponse{Status: fiber.StatusBadRequest, Message: "Unable to save the API key", IsAuthorized: false, Data: t.AccessToken})
@@ -66,16 +68,9 @@ func CreateToken(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(responses.KeyResponse{Status: fiber.StatusCreated, Message: "API Key created successfully", IsAuthorized: false, Key: t})
 }
 
-func VerifyKey(c *fiber.Ctx) error {
-	data, err := token.VerifyToken(c)
-
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(responses.AuthorizationResponse{Status: fiber.StatusInternalServerError, Message: err.Error(), IsAuthorized: false, Data: data})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(data)
-}
-
+// ------------------------------------------------------- //
+// Retrieve all of the users API keys                      //
+// ------------------------------------------------------- //
 func GetTokens(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -99,7 +94,7 @@ func GetTokens(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: "Unable to retrieve userid", IsAuthorized: false})
 	}
 
-	result, err := apikeyCollection.Find(ctx, bson.M{"user_id": objectId})
+	result, err := apiKeyCollection.Find(ctx, bson.M{"user_id": objectId})
 
 	if err != nil {
 		log.Println(err.Error())
@@ -115,6 +110,9 @@ func GetTokens(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(responses.APIKeysResponse{Status: fiber.StatusOK, Message: "OK", Keys: retrievedTokens})
 }
 
+// ------------------------------------------------------- //
+// Delete a given API key       			               //
+// ------------------------------------------------------- //
 func DeleteToken(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -133,32 +131,32 @@ func DeleteToken(c *fiber.Ctx) error {
 	}
 
 	if err := c.BodyParser(&at); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(responses.ErrorResponse{Status: fiber.StatusBadRequest, Message: "Not enough data has been provided in the POST request."})
+		return c.Status(fiber.StatusBadRequest).JSON(responses.ErrorResponse{Status: fiber.StatusBadRequest, Message: messages.SERVER_INCORRECT_OR_MISSING_DATA_IN_REQUEST})
 	}
 
 	if validationErr := validate.Struct(&at); validationErr != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(responses.ErrorResponse{Status: fiber.StatusBadRequest, Message: "Invalid data provided in the POST request."})
+		return c.Status(fiber.StatusBadRequest).JSON(responses.ErrorResponse{Status: fiber.StatusBadRequest, Message: messages.SERVER_INCORRECT_OR_MISSING_DATA_IN_REQUEST})
 	}
 
 	objectId, err := primitive.ObjectIDFromHex(uid)
 	if err != nil {
 		log.Println(err.Error())
-		return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: "Unable to retrieve userid", IsAuthorized: false})
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: messages.AUTH_INCORRECT_USERNAME_OR_PASSWORD, IsAuthorized: false})
 	}
 
-	deletedDocument, err := apikeyCollection.DeleteOne(ctx, bson.M{"$and": []bson.M{
+	deletedDocument, err := apiKeyCollection.DeleteOne(ctx, bson.M{"$and": []bson.M{
 		{"user_id": objectId},
 		{"access_token": at.AccessToken},
 	}})
 
 	if deletedDocument.DeletedCount == 0 {
-		return c.Status(fiber.StatusNotModified).JSON(responses.DeletedResponse{Status: fiber.StatusNotModified, IsDeleted: false})
+		return c.Status(fiber.StatusNotModified).JSON(responses.GenericDeletedResponse{Status: fiber.StatusNotModified, IsDeleted: false})
 	}
 
 	if err != nil {
 		log.Println(err.Error())
-		return c.Status(fiber.StatusNotModified).JSON(responses.DeletedResponse{Status: fiber.StatusNotModified, IsDeleted: false})
+		return c.Status(fiber.StatusNotModified).JSON(responses.GenericDeletedResponse{Status: fiber.StatusNotModified, IsDeleted: false})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(responses.DeletedResponse{Status: fiber.StatusOK, IsDeleted: true})
+	return c.Status(fiber.StatusOK).JSON(responses.GenericDeletedResponse{Status: fiber.StatusOK, IsDeleted: true})
 }

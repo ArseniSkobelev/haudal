@@ -31,11 +31,6 @@ type UserDetailsResponse struct {
 	Email   string `json:"email"`
 }
 
-type IndexResponse struct {
-	Status  int    `json:"status"`
-	Message string `json:"message"`
-}
-
 type ErrorResponse struct {
 	Status       int    `json:"status"`
 	Message      string `json:"message"`
@@ -48,7 +43,12 @@ type APIKeysResponse struct {
 	Keys    []models.APIKey `json:"api_keys"`
 }
 
-type DeletedResponse struct {
+type GenericDeletedResponse struct {
 	Status    int  `json:"status"`
 	IsDeleted bool `json:"is_deleted"`
+}
+
+type GenericSuccessResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
 }

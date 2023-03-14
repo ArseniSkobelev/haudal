@@ -36,11 +36,6 @@ type RequestData struct {
 	AccessToken string `bson:"access_token" json:"access_token"`
 }
 
-type Session struct {
-	JWT    string `bson:"jwt" json:"jwt"`
-	UserID string `bson:"user_id" json:"user_id"`
-}
-
 type Id struct {
 	Id string `bson:"_id" json:"id"`
 }
