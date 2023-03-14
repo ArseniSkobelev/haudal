@@ -37,7 +37,7 @@
     <div
         class="flex flex-col gap-6 items-center overflow-y-auto lg:max-h-[500px]"
     >
-        {#if data.api_keys.lenght > 0}
+        {#if data.api_keys.length > 0}
             {#each data.api_keys as application}
                 <div class="flex flex-col gap-4 bg-white p-4 rounded w-full">
                     <div

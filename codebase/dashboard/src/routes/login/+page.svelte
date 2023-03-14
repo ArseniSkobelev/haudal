@@ -64,7 +64,7 @@
             </div>
         </div>
         <div
-            class="hidden xl:block xl:w-1/2 bg-login_image bg-cover bg-no-repeat rounded-r"
+            class="hidden xl:block xl:w-1/2 bg-gradient-to-r from-green-200 via-green-300 to-blue-500 rounded-r"
         />
     </section>
 </main>
