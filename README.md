@@ -48,6 +48,8 @@
         <li><a href="#api-key-management">API key management</a></li>
         <li><a href="#analytics">Analytics</a></li>
         <li><a href="#logging">Logging</a></li>
+        <li><a href="#application-administrator-dashboard">Application administrator dashboard</a></li>
+        <li><a href="#public-analytics-dashboard">Public analytics dashboard</a></li>
       </ul>
     </li>
     <li><a href="#usage">COMMING SOON</a></li>
@@ -133,12 +135,22 @@ This section of the README will present to you a map of all the services and a s
 
 <br />
 
+### Application administrator dashboard
+*To be written...*
+
+<br />
+
+### Public analytics dashboard
+*To be written...*
+
+<br />
+
 
 <br />
 <br />
 
 ## Disclaimer
-Use of any widely available APIs/services presented on this page DO gather data (Primarily **geolocation**) about it's use and store them in a way that may or may not be safe or ***"according to the rules".*** At one point the telemetry will be publicly available for others to inspect and/or use in their ways.
+Use of any widely available APIs/services presented on this page is considered an acceptance of the **TOSs.** Our applications DO gather telemetry (primarily **geolocation**). The storage methods that are used may or may not be safe or ***"according to the rules".*** At one point the telemetry will be publicly available for others to inspect and/or use in their ways.
 
 <br />
 
