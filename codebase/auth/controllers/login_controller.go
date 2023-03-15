@@ -7,6 +7,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/ArseniSkobelev/haudal/internal/env"
 	"github.com/ArseniSkobelev/haudal/internal/helpers"
 	messages "github.com/ArseniSkobelev/haudal/internal/messages"
 	"github.com/ArseniSkobelev/haudal/models"
@@ -38,7 +39,7 @@ func Login(c *fiber.Ctx) error {
 	} else {
 		var apiKey models.APIKey
 
-		body := helpers.HTTPRequest(fmt.Sprintf("https://keys.haudal.com/api/v1/token/?access_token=%v", xHaudalKey), c.Get("Authorization"))
+		body := helpers.HTTPRequest(fmt.Sprintf("%v/api/v1/token?access_token=%v", env.GetEnvValue("TOKEN_SERVICE_NAME", env.PRODUCTION), xHaudalKey), c.Get("Authorization"))
 
 		if err := json.Unmarshal(body, &apiKey); err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: messages.APIKEY_NON_EXISTANT, IsAuthorized: false})
