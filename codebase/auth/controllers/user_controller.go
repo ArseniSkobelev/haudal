@@ -2,16 +2,18 @@ package controllers
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"log"
 	"time"
 
 	"github.com/ArseniSkobelev/haudal/internal/db"
-	"github.com/ArseniSkobelev/haudal/internal/env"
 	"github.com/ArseniSkobelev/haudal/internal/helpers"
+	messages "github.com/ArseniSkobelev/haudal/internal/messages"
 	"github.com/ArseniSkobelev/haudal/models"
 	"github.com/ArseniSkobelev/haudal/responses"
 	"github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,7 +21,7 @@ import (
 )
 
 var userCollection *mongo.Collection = db.GetCollection(db.DB, "users")
-var apikeysCollection *mongo.Collection = db.GetCollection(db.DB, "api_keys")
+
 var validate = validator.New()
 
 func CreateUser(c *fiber.Ctx) error {
@@ -28,11 +30,11 @@ func CreateUser(c *fiber.Ctx) error {
 	defer cancel()
 
 	if err := c.BodyParser(&u); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(responses.ErrorResponse{Status: fiber.StatusBadRequest, Message: "Not enough data has been provided in the POST request."})
+		return c.Status(fiber.StatusBadRequest).JSON(responses.ErrorResponse{Status: fiber.StatusBadRequest, Message: messages.SERVER_INCORRECT_OR_MISSING_DATA_IN_REQUEST})
 	}
 
 	if validationErr := validate.Struct(&u); validationErr != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(responses.ErrorResponse{Status: fiber.StatusBadRequest, Message: "Invalid data provided in the POST request."})
+		return c.Status(fiber.StatusBadRequest).JSON(responses.ErrorResponse{Status: fiber.StatusBadRequest, Message: messages.SERVER_INCORRECT_OR_MISSING_DATA_IN_REQUEST})
 	}
 
 	nu := models.User{
@@ -48,10 +50,10 @@ func CreateUser(c *fiber.Ctx) error {
 	} else {
 		var apiKey models.APIKey
 
-		err := apikeysCollection.FindOne(ctx, bson.M{"access_token": xHaudalKey}).Decode(&apiKey)
+		body := helpers.HTTPRequest(fmt.Sprintf("https://keys.haudal.com/api/v1/token/?access_token=%v", xHaudalKey), c.Get("Authorization"))
 
-		if err != nil {
-			return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: "X-Haudal-Key HTTP header is missing or is malformed.", IsAuthorized: false})
+		if err := json.Unmarshal(body, &apiKey); err != nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: messages.APIKEY_NON_EXISTANT, IsAuthorized: false})
 		}
 
 		nu.UserType = models.UserType(models.DEFAULT.String())
@@ -63,12 +65,12 @@ func CreateUser(c *fiber.Ctx) error {
 	}}).Decode(&u)
 
 	if err == nil {
-		return c.Status(fiber.StatusConflict).JSON(responses.ErrorResponse{Status: fiber.StatusConflict, Message: "User with the given email already exists."})
+		return c.Status(fiber.StatusConflict).JSON(responses.ErrorResponse{Status: fiber.StatusConflict, Message: messages.USER_EMAIL_IN_USE})
 	}
 
 	_, err = userCollection.InsertOne(ctx, nu)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(responses.UserResponse{Status: fiber.StatusBadRequest, Message: "Unable to create user.", Data: &fiber.Map{"data": ""}})
+		return c.Status(fiber.StatusBadRequest).JSON(responses.UserResponse{Status: fiber.StatusBadRequest, Message: messages.SERVER_INTERNAL_SERVER_ERROR, Data: &fiber.Map{"data": ""}})
 	}
 
 	token := helpers.CreateJwtToken(nu.Email, string(nu.UserType))
@@ -78,44 +80,30 @@ func CreateUser(c *fiber.Ctx) error {
 
 func GetUser(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	var u models.User
+	var u models.RetrievedUser
 	defer cancel()
 
-	token := helpers.GetAuthToken(c)
+	authHeader := c.Get("Authorization")
 
-	claims := jwt.MapClaims{}
+	uid, _, isUser := helpers.VerifyUserToken(ctx, authHeader)
 
-	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(env.GetEnvValue("SECRET_KEY", env.PRODUCTION)), nil
-	})
+	if isUser == false {
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: messages.AUTH_INCORRECT_USERNAME_OR_PASSWORD, IsAuthorized: false})
+	}
+
+	objectId, err := primitive.ObjectIDFromHex(uid)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: messages.SERVER_INTERNAL_SERVER_ERROR, IsAuthorized: false})
+	}
+
+	err = userCollection.FindOne(ctx, bson.M{"_id": objectId}).Decode(&u)
 
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "Unable to gather session data.", Data: token, IsAuthorized: false})
+		log.Println(err.Error())
+		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "Unable to find a user with the provided data.", IsAuthorized: false})
 	}
 
-	var userType string
+	log.Println(u)
 
-	apiKeyHeader := c.Get("X-Haudal-Key")
-
-	if len(apiKeyHeader) == 0 {
-		userType = "admin"
-	} else {
-		userType = "default"
-	}
-
-	userId := helpers.GetUserIdByEmail(ctx, claims["user_email"].(string), userType)
-
-	objId, err := primitive.ObjectIDFromHex(userId)
-
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "Unable to find a user with the provided data.", Data: token, IsAuthorized: false})
-	}
-
-	err = userCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&u)
-
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "Unable to find a user with the provided data.", Data: token, IsAuthorized: false})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(responses.UserDetailsResponse{Status: fiber.StatusOK, Message: "OK", Email: u.Email})
+	return c.Status(fiber.StatusOK).JSON(responses.UserDetailsResponse{Status: fiber.StatusOK, Message: "OK", Email: u.Email, Id: u.ID, UserType: u.UserType})
 }

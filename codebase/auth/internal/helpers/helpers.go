@@ -2,7 +2,9 @@ package helpers
 
 import (
 	"context"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -63,7 +65,6 @@ func GenerateAPIKey(uid primitive.ObjectID, appName string) (interface{}, error)
 		AccessToken: uuid.New().String(),
 		UserID:      uid,
 		AppName:     appName,
-		// RefreshToken: uuid.New().String(),
 	}, nil
 }
 
@@ -76,8 +77,6 @@ func GetAuthToken(c *fiber.Ctx) string {
 
 func GetUserIdByEmail(ctx context.Context, email string, user_type string) string {
 	var id models.Id
-
-	// err := userCollection.FindOne(ctx, bson.M{"email": email}).Decode(&id)
 
 	err := userCollection.FindOne(ctx, bson.M{"$and": []bson.M{
 		{"email": email},
@@ -127,4 +126,32 @@ func VerifyUserToken(ctx context.Context, authHeader string) (string, string, bo
 	}
 
 	return uid, u.UserType.String(), true
+}
+
+func HTTPRequest(url string, authHeader string) []byte {
+	client := http.Client{}
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Println(err.Error())
+		return []byte{}
+	}
+
+	req.Header = http.Header{
+		"Authorization": {authHeader},
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		log.Println(err.Error())
+		return []byte{}
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Println(err.Error())
+		return []byte{}
+	}
+
+	return body
 }

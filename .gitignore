@@ -5,4 +5,6 @@
 **/.vs
 **/dist
 **/docker-compose-dev.yaml
-**/dev_data
+**/dev_data*
+**/.vscode
+**/ignore*
