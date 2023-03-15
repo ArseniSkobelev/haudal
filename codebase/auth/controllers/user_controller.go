@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/ArseniSkobelev/haudal/internal/db"
+	"github.com/ArseniSkobelev/haudal/internal/env"
 	"github.com/ArseniSkobelev/haudal/internal/helpers"
 	messages "github.com/ArseniSkobelev/haudal/internal/messages"
 	"github.com/ArseniSkobelev/haudal/models"
@@ -22,13 +23,16 @@ import (
 
 var userCollection *mongo.Collection = db.GetCollection(db.DB, "users")
 
+// Validator required to ensure that the input data is correct
 var validate = validator.New()
 
 func CreateUser(c *fiber.Ctx) error {
+	// Create a db context with a "garbage collector" with defer
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	var u models.User
 	defer cancel()
+	var u models.User
 
+	// Parse and validate input data from POST request
 	if err := c.BodyParser(&u); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(responses.ErrorResponse{Status: fiber.StatusBadRequest, Message: messages.SERVER_INCORRECT_OR_MISSING_DATA_IN_REQUEST})
 	}
@@ -37,12 +41,14 @@ func CreateUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(responses.ErrorResponse{Status: fiber.StatusBadRequest, Message: messages.SERVER_INCORRECT_OR_MISSING_DATA_IN_REQUEST})
 	}
 
+	// Create a new_user template/skeleton
 	nu := models.User{
 		Email:        u.Email,
 		PasswordHash: helpers.HashPassword(u.PasswordHash, bcrypt.DefaultCost),
 		UserType:     u.UserType,
 	}
 
+	// Decide whether the user is an application admin or default user
 	xHaudalKey := c.Get("X-Haudal-Key")
 
 	if len(xHaudalKey) == 0 {
@@ -50,7 +56,7 @@ func CreateUser(c *fiber.Ctx) error {
 	} else {
 		var apiKey models.APIKey
 
-		body := helpers.HTTPRequest(fmt.Sprintf("https://keys.haudal.com/api/v1/token/?access_token=%v", xHaudalKey), c.Get("Authorization"))
+		body := helpers.HTTPRequest(fmt.Sprintf("%v/api/v1/token?access_token=%v", env.GetEnvValue("TOKEN_SERVICE_NAME", env.PRODUCTION), xHaudalKey), c.Get("Authorization"))
 
 		if err := json.Unmarshal(body, &apiKey); err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: messages.APIKEY_NON_EXISTANT, IsAuthorized: false})
@@ -59,6 +65,7 @@ func CreateUser(c *fiber.Ctx) error {
 		nu.UserType = models.UserType(models.DEFAULT.String())
 	}
 
+	// Check whether the new user already exists
 	err := userCollection.FindOne(ctx, bson.M{"$and": []bson.M{
 		{"email": nu.Email},
 		{"user_type": nu.UserType},
@@ -68,6 +75,7 @@ func CreateUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusConflict).JSON(responses.ErrorResponse{Status: fiber.StatusConflict, Message: messages.USER_EMAIL_IN_USE})
 	}
 
+	// Push the new user to the DB
 	_, err = userCollection.InsertOne(ctx, nu)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(responses.UserResponse{Status: fiber.StatusBadRequest, Message: messages.SERVER_INTERNAL_SERVER_ERROR, Data: &fiber.Map{"data": ""}})
