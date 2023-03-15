@@ -2,7 +2,9 @@ package helpers
 
 import (
 	"context"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -124,4 +126,32 @@ func VerifyUserToken(ctx context.Context, authHeader string) (string, string, bo
 	}
 
 	return uid, u.UserType.String(), true
+}
+
+func HTTPRequest(url string, authHeader string) []byte {
+	client := http.Client{}
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Println(err.Error())
+		return []byte{}
+	}
+
+	req.Header = http.Header{
+		"Authorization": {authHeader},
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		log.Println(err.Error())
+		return []byte{}
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Println(err.Error())
+		return []byte{}
+	}
+
+	return body
 }

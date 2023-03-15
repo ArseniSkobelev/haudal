@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -48,9 +50,9 @@ func CreateUser(c *fiber.Ctx) error {
 	} else {
 		var apiKey models.APIKey
 
-		err := apiKeyCollection.FindOne(ctx, bson.M{"access_token": xHaudalKey}).Decode(&apiKey)
+		body := helpers.HTTPRequest(fmt.Sprintf("https://keys.haudal.com/api/v1/token/?access_token=%v", xHaudalKey), c.Get("Authorization"))
 
-		if err != nil {
+		if err := json.Unmarshal(body, &apiKey); err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: messages.APIKEY_NON_EXISTANT, IsAuthorized: false})
 		}
 
