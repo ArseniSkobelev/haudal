@@ -1,22 +1,14 @@
 package responses
 
 import (
-	"github.com/ArseniSkobelev/haudal/models"
-	"github.com/gofiber/fiber/v2"
+	"github.com/ArseniSkobelev/haudal/codebase/api-keys/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type UserResponse struct {
-	Status  int        `json:"status"`
-	Message string     `json:"message"`
-	Data    *fiber.Map `json:"data"`
-}
-
 type AuthorizationResponse struct {
-	Status       int         `json:"status"`
-	Message      string      `json:"message"`
-	IsAuthorized bool        `json:"is_authorized"`
-	Data         interface{} `json:"token"`
+	Status       int    `json:"status"`
+	Message      string `json:"message"`
+	IsAuthorized bool   `json:"is_authorized"`
 }
 
 type KeyResponse struct {
@@ -24,14 +16,6 @@ type KeyResponse struct {
 	Message      string        `json:"message"`
 	IsAuthorized bool          `json:"is_authorized"`
 	Key          models.APIKey `json:"key"`
-}
-
-type UserDetailsResponse struct {
-	Status   int                `json:"status"`
-	Message  string             `json:"message"`
-	Email    string             `json:"email"`
-	Id       primitive.ObjectID `bson:"_id" json:"_id,omitempty"`
-	UserType models.UserType    `bson:"user_type" json:"user_type"`
 }
 
 type ErrorResponse struct {
@@ -46,6 +30,12 @@ type APIKeysResponse struct {
 	Keys    []models.APIKey `json:"api_keys"`
 }
 
+type APIKeyResponse struct {
+	Status  int           `json:"status"`
+	Message string        `json:"message"`
+	Key     models.APIKey `json:"api_key"`
+}
+
 type GenericDeletedResponse struct {
 	Status    int  `json:"status"`
 	IsDeleted bool `json:"is_deleted"`
@@ -54,4 +44,18 @@ type GenericDeletedResponse struct {
 type GenericSuccessResponse struct {
 	Status  int    `json:"status"`
 	Message string `json:"message"`
+}
+
+type UserDetailsResponse struct {
+	Status   int                `json:"status"`
+	Message  string             `json:"message"`
+	Email    string             `json:"email"`
+	Id       primitive.ObjectID `bson:"_id" json:"_id,omitempty"`
+	UserType models.UserType    `bson:"user_type" json:"user_type"`
+}
+
+type GenericResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Success bool   `json:"success"`
 }

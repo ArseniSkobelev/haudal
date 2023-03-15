@@ -78,7 +78,7 @@ func CreateUser(c *fiber.Ctx) error {
 
 func GetUser(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	var u models.User
+	var u models.RetrievedUser
 	defer cancel()
 
 	authHeader := c.Get("Authorization")
@@ -101,5 +101,7 @@ func GetUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusUnauthorized, Message: "Unable to find a user with the provided data.", IsAuthorized: false})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(responses.UserDetailsResponse{Status: fiber.StatusOK, Message: "OK", Email: u.Email})
+	log.Println(u)
+
+	return c.Status(fiber.StatusOK).JSON(responses.UserDetailsResponse{Status: fiber.StatusOK, Message: "OK", Email: u.Email, Id: u.ID, UserType: u.UserType})
 }

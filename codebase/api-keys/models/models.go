@@ -48,12 +48,6 @@ type RetrievedKeys struct {
 	Keys []APIKey `bson:"api_keys" json:"api_keys"`
 }
 
-type RetrievedUser struct {
-	ID       primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-	Email    string             `json:"email"`
-	UserType UserType           `bson:"user_type" json:"user_type"`
-}
-
 func (u *User) Serialize() {
 	u.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 }
