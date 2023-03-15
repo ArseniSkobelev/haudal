@@ -32,6 +32,7 @@ func Login(c *fiber.Ctx) error {
 
 	u.Serialize()
 
+	// Get the HTTP request header for the API key (X-Haudal-Key) and decide whether the user is an application admin or a default user
 	xHaudalKey := c.Get("X-Haudal-Key")
 
 	if len(xHaudalKey) == 0 {
@@ -39,15 +40,19 @@ func Login(c *fiber.Ctx) error {
 	} else {
 		var apiKey models.APIKey
 
+		// Check whether the provided access_token exists
 		body := helpers.HTTPRequest(fmt.Sprintf("%v/api/v1/token?access_token=%v", env.GetEnvValue("TOKEN_SERVICE_NAME", env.PRODUCTION), xHaudalKey), c.Get("Authorization"))
 
+		// Unmarshal the body []byte to apiKey variable of type APIKey
 		if err := json.Unmarshal(body, &apiKey); err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(responses.ErrorResponse{Status: fiber.StatusUnauthorized, Message: messages.APIKEY_NON_EXISTANT, IsAuthorized: false})
 		}
 
+		// Set the UserType of the current user to default for further validation
 		u.UserType = models.UserType(models.DEFAULT.String())
 	}
 
+	// Check whether the user exists. The user type is required to ensure that a user is able to have an application admin account AND a default user account
 	err := userCollection.FindOne(ctx, bson.M{"$and": []bson.M{
 		{"email": u.Email},
 		{"user_type": u.UserType.String()},
