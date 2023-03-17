@@ -76,3 +76,14 @@ func Login(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusUnauthorized).JSON(responses.AuthorizationResponse{Status: fiber.StatusOK, Message: "OK", Data: token, IsAuthorized: true})
 }
+
+func IsUserAuthorized(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	authHeader := c.Get("Authorization")
+
+	_, _, isUser := helpers.VerifyUserToken(ctx, authHeader)
+
+	return c.Status(fiber.StatusOK).JSON(responses.AuthorizationResponse{Status: fiber.StatusOK, Message: "User is not authorized.", IsAuthorized: isUser})
+}

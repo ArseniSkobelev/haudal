@@ -24,6 +24,7 @@ var validate = validator.New()
 // Create API key and return it					           //
 // ------------------------------------------------------- //
 func CreateToken(c *fiber.Ctx) error {
+	// Predefine variables
 	var t models.APIKey
 	var ad models.ApplicationData
 
